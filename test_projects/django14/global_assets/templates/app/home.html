@@ -1,0 +1,14 @@
+{% extends "app/base.html" %}
+{% load url from future %}
+{% load i18n static %}
+
+
+{% block content %}
+
+  <h1>{% trans 'SelectMultiple Demos' %}</h1>
+
+  <ul>
+    <li><a href="{% url 'selectmultiple_list' %}">{% trans 'Sample pizza parlor app' %}</a></li>
+  </ul>
+
+{% endblock %}
