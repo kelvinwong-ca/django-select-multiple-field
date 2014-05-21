@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.core.urlresolvers import reverse, reverse_lazy
-from django.views.generic import CreateView, DetailView, DeleteView, ListView, UpdateView
+from django.core.urlresolvers import reverse_lazy
+from django.views.generic import (
+    CreateView, DetailView, DeleteView, ListView, UpdateView)
 
 from .models import Pizza
 
@@ -29,6 +30,7 @@ class PizzaUpdateView(UpdateView):
 
     model = Pizza
     success_url = reverse_lazy('pizza:updated')
+
 
 class PizzaDeleteView(DeleteView):
 
