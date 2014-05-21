@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.core import exceptions, validators
 from django.db import models
-from django.utils.encoding import force_text, python_2_unicode_compatible, smart_unicode
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 
@@ -42,7 +42,8 @@ class SelectMultipleField(models.Field):
         When SelectMultipleField is assigned a value, this method coerces
         into a list usable by Python
         """
-        delimiter = getattr(settings, 'SELECTMULTIPLEFIELD_DELIMITER', DEFAULT_DELIMITER)
+        delimiter = getattr(
+            settings, 'SELECTMULTIPLEFIELD_DELIMITER', DEFAULT_DELIMITER)
         if isinstance(value, basestring):
             pyval = decode_csv_to_list(value)
             return pyval
@@ -58,7 +59,8 @@ class SelectMultipleField(models.Field):
         """
         Perform preliminary non-db specific value checks and conversions.
 
-        This takes a Python list and encodes it into a form storable in the database
+        This takes a Python list and encodes it into a form storable in the
+        database
         """
         return encode_list_to_csv(value)
 
@@ -135,7 +137,7 @@ class SelectMultipleField(models.Field):
             defaults['coerce'] = self.to_python
             if self.null:
                 defaults['empty_value'] = None
-            #form_class = forms.TypedChoiceField
+
             # Many of the subclass-specific formfield arguments (min_value,
             # max_value) don't apply for choice fields, so be sure to only pass
             # the values that TypedChoiceField will understand.
