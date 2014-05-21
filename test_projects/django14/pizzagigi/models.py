@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.core.urlresolvers import reverse
 from django.db import models
-from django.utils.encoding import force_unicode
+from django.utils.encoding import (
+    force_text, force_unicode, python_2_unicode_compatible)
 from django.utils.translation import ugettext_lazy as _
 
 from select_multiple_field.models import SelectMultipleField
 
 
+@python_2_unicode_compatible
 class Pizza(models.Model):
     ANCHOVIES = 'a'
     BLACK_OLIVES = 'b'
@@ -36,6 +39,12 @@ class Pizza(models.Model):
         max_length=10,
         choices=TOPPING_CHOICES
     )
+
+    def __str__(self):
+        return "pk=%s" % force_text(self.pk)
+
+    def get_absolute_url(self):
+        return reverse('pizza:detail', args=[self.pk])
 
 
 def show_topping(ingredient):
