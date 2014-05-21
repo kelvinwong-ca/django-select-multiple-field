@@ -12,11 +12,14 @@ class SelectMultipleField(widgets.SelectMultiple):
     allow_multiple_selected = True
 
     def render(self, name, value, attrs=None, choices=()):
-        if value is None: value = []
+        if value is None:
+            value = []
+
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<select multiple="multiple"%s>' % flatatt(final_attrs)]
         options = self.render_options(choices, value)
         if options:
             output.append(options)
+
         output.append('</select>')
         return mark_safe(u'\n'.join(output))
