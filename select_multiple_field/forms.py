@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.forms import fields
-from django.utils.translation import ugettext_lazy as _
+# from django.utils.translation import ugettext_lazy as _
 
-from .codecs import decode_csv_to_list, encode_list_to_csv
+# from .codecs import decode_csv_to_list, encode_list_to_csv
 from .widgets import SelectMultipleField
 
 
@@ -23,10 +23,13 @@ class SelectMultipleFormField(fields.TypedMultipleChoiceField):
 
     def to_python(self, value):
         """
-        Takes database value, usually char string, and makes it into a Python list
+        Takes database value, usually char string, and makes it into a Python
+        list
+
         Method also handles lists and strings
         """
-        delimiter = getattr(settings, 'SELECTMULTIPLEFIELD_DELIMITER', DEFAULT_DELIMITER)
+        delimiter = getattr(
+            settings, 'SELECTMULTIPLEFIELD_DELIMITER', DEFAULT_DELIMITER)
         if value is None:
             return []
         if isinstance(value, basestring):
@@ -37,7 +40,8 @@ class SelectMultipleFormField(fields.TypedMultipleChoiceField):
         """
         Prepares a string for use in serializer
         """
-        delimiter = getattr(settings, 'SELECTMULTIPLEFIELD_DELIMITER', DEFAULT_DELIMITER)
+        delimiter = getattr(
+            settings, 'SELECTMULTIPLEFIELD_DELIMITER', DEFAULT_DELIMITER)
         if isinstance(value, (list, tuple)):
             if len(value) == 0:
                 return ''
