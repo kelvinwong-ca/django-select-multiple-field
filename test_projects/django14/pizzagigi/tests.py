@@ -1,16 +1,22 @@
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
-Replace this with more appropriate tests for your application.
-"""
-
+from django.core.urlresolvers import reverse
 from django.test import TestCase
+#from django.test.client import RequestFactory
+
+from .models import Pizza
 
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)
+class PizzaListViewTestCase(TestCase):
+
+    def test_view(self):
+        response = self.client.get(reverse('pizza:list'))
+        self.assertEqual(response.status_code, 200)
+
+
+class PizzaCreateViewTestCase(TestCase):
+
+    def test_view(self):
+        response = self.client.get(reverse('pizza:create'))
+        self.assertEqual(response.status_code, 200)

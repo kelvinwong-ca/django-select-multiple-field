@@ -3,12 +3,16 @@
 {% load i18n static %}
 
 
-{% block content %}
+{% block body %}
 
-  <h1>{% trans 'SelectMultiple Demos' %}</h1>
+<div class="row">
+  <div class="col-xs-12">
+    <h1>{% trans 'SelectMultiple Demos' %}</h1>
 
-  <ul>
-    <li><a href="{% url 'select_multiple_list' %}">{% trans 'Sample pizza parlor app' %}</a></li>
-  </ul>
+    <ul>
+      <li><a href="{% url 'pizza:list' %}">{% trans 'Sample pizza shoppe app' %}</a></li>
+    </ul>
+  </div>
+</div>
 
 {% endblock %}

@@ -47,16 +47,52 @@
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Demos <b class="caret"></b></a>
             <ul class="dropdown-menu">
               <li class="dropdown-header">SelectMultiple Field demos</li>
-              <li><a href="{% url 'select_multiple_list' %}">Survey app using SelectMultiple field and jQuery</a></li>
+              <li><a href="{% url 'pizza:list' %}">Pizza shoppe app using SelectMultiple field and jQuery</a></li>
             </ul>
           </li>
+          <li><a href="{% url 'admin:index' %}">{% trans 'Django admin' %}</a></li>
         </ul>
       </div><!--/.nav-collapse -->
     </div>
   </div>
 
 
+<div class="container"><!-- BEGIN Container -->
+
+
+  {% block messaging %}
+  {% if messages %}
+  
+  <div class="row space-svp">
+    <div class="col-xs-12">
+    {% for message in messages %}
+
+      {% if message.tags %}
+      <div class="alert alert-{{ message.tags }}">
+        {% if 'safe' in message.tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        {{ message }}
+      </div>
+      {% endif %}
+
+    {% endfor %}
+    </div>
+  {% endif %}
+  {% block messaging_extra %}{% endblock %}
+  {% endblock %}
+
+  {% block breadcrumbs %}
+  <ol class="breadcrumb">
+    <li class="active">{% trans 'Home' %}</li>
+  </ol>
+  {% endblock %}
+
   {% block body %}{% endblock %}
+
+
+</div><!-- END Container -->
 
 
   <!--                -->
