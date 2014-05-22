@@ -21,6 +21,8 @@
 
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
+  <link href="{{ STATIC_URL }}css/app.css" rel="stylesheet">
+
   {% endblock %}
   {% block extra_head %}{% endblock %}
 {% endblock %}
@@ -57,10 +59,24 @@
             </ul>
           </li>
           <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Language' %} <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li class="dropdown-header">{% trans 'Languages' %}</li>
+              {% for lang in LANGUAGES %}
+              <li>
+                <form name="setLang{{ lang.1 }}" action="{% url 'django.views.i18n.set_language' %}" method="post">{% csrf_token %}
+                  <input name="next" type="hidden" value="" />
+                  <input type="hidden" name="language" value="{{ lang.0 }}" />
+                  <a href="#" onclick="document.setLang{{ lang.1  }}.submit(); return false;">{{ lang.1 }}</a>
+                </form>
+              </li>
+              {% endfor %}
+            </ul>
+          </li>
+          <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> <b class="caret"></b></a>
             <ul class="dropdown-menu">
               <li class="dropdown-header">{% trans 'Application settings' %}</li>
-              <li><a href="{% url 'admin:index' %}">{% trans 'Set language' %}</a></li>
               <li><a href="{% url 'admin:index' %}">{% trans 'Django admin' %}</a></li>
             </ul>
           </li>
