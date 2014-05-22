@@ -4,6 +4,9 @@
 {% load pizza_tags %}
 
 
+{% block page_title %}{% trans 'Pizzas' %}{% endblock %}
+
+
 {% block content %}
 
   <h1>{% trans 'Pizzas' %}</h1>
@@ -49,6 +52,6 @@
   {% endif %}
 
 
-  <a href="{% url 'pizza:create' %}" class="btn btn-primary btn-lg">Create a pizza</a>
+  <a href="{% url 'pizza:create' %}" class="btn btn-primary btn-lg">{% trans 'Create a pizza' %}</a>
 
 {% endblock %}

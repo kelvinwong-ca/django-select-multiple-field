@@ -4,12 +4,15 @@
 {% load pizza_tags %}
 
 
+{% block page_title %}{% trans 'Pizza' %} #{{ pizza.id }}{% endblock %}
+
+
 {% block breadcrumbs %}
 
 <ol class="breadcrumb">
   <li><a href="{% url 'home' %}">{% trans 'Home' %}</a></li>
   <li><a href="{% url 'pizza:list' %}">{% trans 'Pizza list' %}</a></li>
-  <li class="active">{% trans 'Pizza' %} #{{ pizza.pk }}</li>
+  <li class="active">{% trans 'Pizza' %} #{{ pizza.id }}</li>
 </ol>
 
 {% endblock %}
@@ -17,7 +20,7 @@
 
 {% block content %}
 
-  <h1>{% trans 'Pizza' %} #{{ pizza.pk }}</h1>
+  <h1>{% trans 'Pizza' %} #{{ pizza.id }}</h1>
 
   <p class="lead">{% trans 'The pizza contains the following yummy ingredients' %}</p>
 
