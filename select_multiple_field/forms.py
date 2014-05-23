@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.forms import fields
+from django.utils import six
 # from django.utils.translation import ugettext_lazy as _
 
 # from .codecs import decode_csv_to_list, encode_list_to_csv
@@ -32,7 +33,7 @@ class SelectMultipleFormField(fields.TypedMultipleChoiceField):
             settings, 'SELECTMULTIPLEFIELD_DELIMITER', DEFAULT_DELIMITER)
         if value is None:
             return []
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             return value.split(delimiter)
         return value
 
