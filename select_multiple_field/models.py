@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.core import exceptions, validators
 from django.db import models
+from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
@@ -44,7 +45,7 @@ class SelectMultipleField(models.Field):
         """
         delimiter = getattr(
             settings, 'SELECTMULTIPLEFIELD_DELIMITER', DEFAULT_DELIMITER)
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             pyval = decode_csv_to_list(value)
             return pyval
         elif value is None:
