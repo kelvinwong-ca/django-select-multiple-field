@@ -35,7 +35,7 @@ class DemoTester(Command):
         from django import get_version
         django_release = re.search(r'^\d\.\d', get_version()).group(0)
         if ((django_release not in self.test_settings.keys())
-                or (get_version() < '1.4.2')):
+                or ([int(n) for n in get_version().split('.')] < [1, 4, 2])):
             print("Please install Django 1.4.2 - 1.7 to run the test suite")
             exit(-1)
         os.environ['DJANGO_SETTINGS_MODULE'] = self.test_settings[
