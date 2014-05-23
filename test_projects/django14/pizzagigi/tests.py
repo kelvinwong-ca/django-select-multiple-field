@@ -26,6 +26,9 @@ class PizzaCreateViewTestCase(TestCase):
         }
         response = self.client.post(reverse('pizza:create'), data)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(
+            response,
+            'http://testserver' + reverse('pizza:created'))
         self.assertEqual(
             response['Location'],
             'http://testserver' + reverse('pizza:created'))
@@ -60,6 +63,9 @@ class PizzaUpdateViewTestCase(TestCase):
         response = self.client.post(
             reverse('pizza:update', args=[self.pizza.id]), data)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(
+            response,
+            'http://testserver' + reverse('pizza:updated'))
         self.assertEqual(
             response['Location'],
             'http://testserver' + reverse('pizza:updated'))
@@ -79,6 +85,9 @@ class PizzaDeleteViewTestCase(TestCase):
         response = self.client.post(
             reverse('pizza:delete', args=[self.pizza.id]))
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(
+            response,
+            'http://testserver' + reverse('pizza:deleted'))
         self.assertEqual(
             response['Location'],
             'http://testserver' + reverse('pizza:deleted'))
