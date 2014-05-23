@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.encoding import (
-    force_text, force_unicode, python_2_unicode_compatible)
+    force_text, python_2_unicode_compatible)
 from django.utils.translation import ugettext_lazy as _
 
 from select_multiple_field.models import SelectMultipleField
@@ -52,4 +52,4 @@ def show_topping(ingredient):
     Decode topping to full name
     """
     decoder = dict(Pizza.TOPPING_CHOICES)
-    return force_unicode(decoder[ingredient])
+    return force_text(decoder[ingredient])
