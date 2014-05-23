@@ -1,0 +1,24 @@
+include LICENSE
+include README.rst
+include CONTRIBUTORS.txt
+
+
+recursive-include test_suite *.py
+
+
+recursive-include test_projects *.py
+
+
+recursive-include test_projects/django14 *.py
+recursive-include test_projects/django14/django14 *.py
+recursive-include test_projects/django14/global_assets/static/css *.css
+recursive-include test_projects/django14/global_assets/static/multiselect-0.9.10 *.txt *.markdown *.json
+recursive-include test_projects/django14/global_assets/static/multiselect-0.9.10/css *.css
+recursive-include test_projects/django14/global_assets/static/multiselect-0.9.10/img *.png
+recursive-include test_projects/django14/global_assets/static/multiselect-0.9.10/js *.js
+recursive-include test_projects/django14/global_assets/templates *.html
+recursive-include test_projects/django14/global_assets/templates/app *.html
+recursive-include test_projects/django14/global_assets/templates/theme *.html
+recursive-include test_projects/django14/pizzagigi *.py
+recursive-include test_projects/django14/pizzagigi/templates/pizzagigi *.html
+recursive-include test_projects/django14/pizzagigi/templatetags *.py
