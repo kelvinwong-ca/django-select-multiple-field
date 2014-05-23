@@ -18,10 +18,11 @@ class SelectMultipleField(widgets.SelectMultiple):
             value = []
 
         final_attrs = self.build_attrs(rendered_attrs, name=name)
-        output = [u'<select multiple="multiple"%s>' % flatatt(final_attrs)]
+        # output = [u'<select multiple="multiple"%s>' % flatatt(final_attrs)]
+        output = ['<select multiple="multiple"{0}>'.format(flatatt(final_attrs))]
         options = self.render_options(choices, value)
         if options:
             output.append(options)
 
         output.append('</select>')
-        return mark_safe(u'\n'.join(output))
+        return mark_safe('\n'.join(output))
