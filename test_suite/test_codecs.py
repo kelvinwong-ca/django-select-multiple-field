@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from django.test import SimpleTestCase
-from django.utils.six.moves import xrange
 
 from select_multiple_field.codecs import (
     DEFAULT_DELIMITER, decode_csv_to_list, encode_list_to_csv)
