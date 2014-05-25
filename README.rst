@@ -7,6 +7,104 @@ Select multiple choices in a single Django model field.
 .. warning::
 
     This Django module is not suitable for production use.
+    It has not been sufficiently tested.
+
+Quick Start
+===========
+
+.. important::
+
+    Field attribute ``max_length`` must be set to a value longer than your
+    longest expected encoded string
+
+In your models add the select field choices normally::
+
+    # models.py
+
+    class Pizza(models.Model):
+        ANCHOVIES = 'a'
+        BLACK_OLIVES = 'b'
+        PEPPERONI = 'p'
+        MOZZARELLA = 'm'
+        TOPPING_CHOICES = (
+            (ANCHOVIES, 'Anchovies'),
+            (BLACK_OLIVES, 'Black olives'),
+            (PEPPERONI, 'Pepperoni'),
+            (MOZZARELLA, 'Mozzarella'),
+        )
+
+        toppings = SelectMultipleField(
+            max_length=10,
+            choices=TOPPING_CHOICES
+        )
+
+Use a generic view or a modelform as usual. In your template you can use a regular form tag::
+
+    # template_form.html
+
+    <form action="" method="post">
+      {{ form  }}
+      <input type="submit" value="Submit">
+    </form>
+
+This renders the following HTML::
+
+    # create.html
+
+    <form action="" method="post">
+        <p>
+          <label for="id_toppings">Toppings:</label>
+          <select multiple="multiple" id="id_toppings" name="toppings" class="select-multiple-field">
+            <option value="a">Anchovies</option>
+            <option value="b">Black olives</option>
+            <option value="p">Pepperoni</option>
+            <option value="m">Mozzarella</option>
+          </select>
+        </p>
+        <input type="submit" value="Submit">
+    </form>
+
+Displaying stored choices
+-------------------------
+
+To display your choices, you will need to decode the field contents. This can
+be accomplished with a template tag::
+
+    # templatetags/pizza_tags.py
+
+    def decode_pie(ingredients):
+        """
+        Decode pizza pie toppings
+        """
+        decoder = dict(Pizza.TOPPING_CHOICES)
+        decoded = [decoder[t] for t in ingredients]
+        decoded.sort()
+        return ', '.join(decoded)
+
+    register.filter('decode_pie', decode_pie)
+
+In your template you need to import your tags and use them::
+
+    # details.html
+
+    {% load pizza_tags %}
+
+    {{ pizza.toppings|decode_pie }}
+
+Encoding the choices
+====================
+
+The choices that are selected are stored as comma-delimited text. Consider a
+pizza with the following toppings.
+
+    * Pepperoni
+    * Mozzarella
+
+This would be stored as a text field as::
+
+    p,m
+
+The method may limit your ability to search for choices.
 
 Sample application
 ==================
