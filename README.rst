@@ -43,7 +43,7 @@ Use a generic view or a modelform as usual. In your template you can use a regul
     # template_form.html
 
     <form action="" method="post">
-      {{ form  }}
+      {{ form.as_p  }}
       <input type="submit" value="Submit">
     </form>
 
