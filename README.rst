@@ -54,7 +54,8 @@ This renders the following HTML::
     <form action="" method="post">
         <p>
           <label for="id_toppings">Toppings:</label>
-          <select multiple="multiple" id="id_toppings" name="toppings" class="select-multiple-field">
+          <select multiple="multiple" id="id_toppings" name="toppings"
+              class="select-multiple-field">
             <option value="a">Anchovies</option>
             <option value="b">Black olives</option>
             <option value="p">Pepperoni</option>
@@ -100,7 +101,7 @@ pizza with the following toppings.
     * Pepperoni
     * Mozzarella
 
-This would be stored as a text field as::
+This would be stored as a character field as::
 
     p,m
 
