@@ -105,7 +105,7 @@ This would be stored as a character field as::
 
     p,m
 
-The method may limit your ability to search for choices.
+The method of encoding may limit your ability to search for choices.
 
 Sample application
 ==================
