@@ -105,6 +105,17 @@ This would be stored as a character field as::
 
     p,m
 
+This encoded string is decoded to a Python list using functions in the codecs
+module::
+
+    >>> from select_multiple_field.codecs import *
+    >>> encoded = 'a,b,c'
+    >>> decoded = decode_csv_to_list(encoded)
+    >>> print decoded
+    [u'a', u'b', u'c']
+    >>> print type(decoded)
+    <type 'list'>
+
 The method of encoding may limit your ability to search for choices.
 
 Sample application
