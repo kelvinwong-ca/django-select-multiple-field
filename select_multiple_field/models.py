@@ -108,7 +108,8 @@ class SelectMultipleField(models.Field):
                             return
                 elif value == option_key:
                     return
-            msg = self.error_messages['invalid_choice'] % value
+
+            msg = self.error_messages['invalid_choice'] % {'value': value}
             raise exceptions.ValidationError(msg)
 
         if value is None and not self.null:
