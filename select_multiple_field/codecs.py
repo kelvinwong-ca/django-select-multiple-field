@@ -13,7 +13,11 @@ def decode_csv_to_list(encoded):
     """
     delimiter = getattr(
         settings, 'SELECTMULTIPLEFIELD_DELIMITER', DEFAULT_DELIMITER)
-    return sorted(encoded.split(delimiter))
+    if encoded == '':
+        return []
+
+    decoded = sorted(set(encoded.split(delimiter)))
+    return decoded
 
 
 def encode_list_to_csv(decoded):
@@ -24,5 +28,5 @@ def encode_list_to_csv(decoded):
     """
     delimiter = getattr(
         settings, 'SELECTMULTIPLEFIELD_DELIMITER', DEFAULT_DELIMITER)
-    decoded.sort()
+    decoded = sorted(set(decoded))
     return delimiter.join(decoded)
