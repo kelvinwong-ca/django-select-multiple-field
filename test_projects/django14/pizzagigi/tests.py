@@ -11,9 +11,24 @@ from .models import Pizza, show_topping
 
 class PizzaListViewTestCase(TestCase):
 
-    def test_view(self):
+    def test_no_pizzas(self):
+        p = Pizza.objects.all()
+        self.assertEqual(len(p), 0, 'Test requires no pizzas')
         response = self.client.get(reverse('pizza:list'))
         self.assertEqual(response.status_code, 200)
+        self.assertTrue('No pizzas found' in response.content)
+
+    def test_many_pizzas(self):
+        NUM_PIZZAS = 30
+        pizzas = []
+        for n in range(NUM_PIZZAS):
+            p = Pizza.objects.create(toppings=[Pizza.PEPPERONI])
+            pizzas.append(p)
+
+        self.assertEqual(len(pizzas), NUM_PIZZAS, 'Test requires pizzas')
+        response = self.client.get(reverse('pizza:list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(show_topping(Pizza.PEPPERONI) in response.content)
 
 
 class PizzaCreateViewTestCase(TestCase):
@@ -31,7 +46,6 @@ class PizzaCreateViewTestCase(TestCase):
             urlencode(MultiValueDict(data), doseq=True),
             content_type='application/x-www-form-urlencoded'
             )
-        #import pdb; pdb.set_trace()
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(
             response,
