@@ -35,7 +35,7 @@ class DemoTester(Command):
         from django import get_version
         django_release = re.search(r'^\d\.\d', get_version()).group(0)
         if ((django_release not in self.test_settings.keys())
-                or ([int(n) for n in get_version().split('.')] < [1, 4, 2])):
+                or ([int(n) for n in re.split(r'[.ab]', get_version())] < [1, 4, 2])):
             print("Please install Django 1.4.2 - 1.7 to run the test suite")
             exit(-1)
         os.environ['DJANGO_SETTINGS_MODULE'] = self.test_settings[
@@ -45,6 +45,10 @@ class DemoTester(Command):
         except ImportError:
             print("Please install Django 1.4.2 - 1.7 to run the test suite")
             exit(-1)
+
+        import django
+        if hasattr(django, 'setup'):
+            django.setup()
 
         call_command('test', 'pizzagigi', interactive=False, verbosity=1)
 
@@ -65,6 +69,10 @@ class Tester(Command):
     def run(self):
         sys.dont_write_bytecode = True
         os.environ['DJANGO_SETTINGS_MODULE'] = 'test_suite.settings_for_tests'
+        import django
+        if hasattr(django, 'setup'):
+            django.setup()
+
         try:
             from django.utils.unittest import TextTestRunner, defaultTestLoader
         except ImportError:
