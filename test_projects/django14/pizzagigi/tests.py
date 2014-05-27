@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 from django.core.urlresolvers import reverse
 from django.test import SimpleTestCase, TestCase
+from django.utils.datastructures import MultiValueDict
+from django.utils.http import urlencode
 
 from .models import Pizza, show_topping
 
@@ -24,7 +26,12 @@ class PizzaCreateViewTestCase(TestCase):
         data = {
             'toppings': [Pizza.MOZZARELLA, Pizza.PEPPERONI]
         }
-        response = self.client.post(reverse('pizza:create'), data)
+        response = self.client.post(
+            reverse('pizza:create'),
+            urlencode(MultiValueDict(data), doseq=True),
+            content_type='application/x-www-form-urlencoded'
+            )
+        #import pdb; pdb.set_trace()
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(
             response,
@@ -58,7 +65,9 @@ class PizzaUpdateViewTestCase(TestCase):
             'toppings': [Pizza.CHEDDAR_CHEESE, Pizza.MOZZARELLA]
         }
         response = self.client.post(
-            reverse('pizza:update', args=[self.pizza.id]), data)
+            reverse('pizza:update', args=[self.pizza.id]),
+            urlencode(MultiValueDict(data), doseq=True),
+            content_type='application/x-www-form-urlencoded')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(
             response,
