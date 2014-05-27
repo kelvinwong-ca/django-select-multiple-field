@@ -16,7 +16,7 @@ class PizzaListViewTestCase(TestCase):
         self.assertEqual(len(p), 0, 'Test requires no pizzas')
         response = self.client.get(reverse('pizza:list'))
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('No pizzas found' in response.content)
+        self.assertTrue('No pizzas found' in response.content.decode('utf-8'))
 
     def test_many_pizzas(self):
         NUM_PIZZAS = 30
@@ -28,7 +28,8 @@ class PizzaListViewTestCase(TestCase):
         self.assertEqual(len(pizzas), NUM_PIZZAS, 'Test requires pizzas')
         response = self.client.get(reverse('pizza:list'))
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(show_topping(Pizza.PEPPERONI) in response.content)
+        self.assertTrue(
+            show_topping(Pizza.PEPPERONI) in response.content.decode('utf-8'))
 
 
 class PizzaCreateViewTestCase(TestCase):
