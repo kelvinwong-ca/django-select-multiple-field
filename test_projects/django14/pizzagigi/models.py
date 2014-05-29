@@ -33,11 +33,6 @@ class Pizza(models.Model):
         (MOZZARELLA, _('Mozzarella')),
         (MUSHROOMS, _('Mushrooms')),
         (TOMATO, _('Tomato')),
-        (PEPPERONI, _('Pepperoni')),
-        (PROSCIUTTO_CRUDO, _('Prosciutto crudo')),
-        (MOZZARELLA, _('Mozzarella')),
-        (MUSHROOMS, _('Mushrooms')),
-        (TOMATO, _('Tomato')),
     )
 
     toppings = SelectMultipleField(
@@ -45,10 +40,11 @@ class Pizza(models.Model):
         choices=TOPPING_CHOICES
     )
 
-    #def get_toppings(self):
-    #    if self.toppings:
-    #        self.toppings
-    #get_toppings.short_description = _(u'Toppings')
+    def get_toppings(self):
+        if self.toppings:
+            keys_choices = self.toppings
+            return u'%s' % (', '.join(filter(bool, keys_choices)))
+    get_toppings.short_description = _(u'Toppings')
 
     def __unicode__(self):
         return u'Pizza'

@@ -5,7 +5,7 @@ from .models import Pizza
 
 class PizzaAdmin(admin.ModelAdmin):
     meu_model = Pizza
-    list_display = ('toppings',)
+    list_display = ('get_toppings',)
     
     class Media:
         css = {
