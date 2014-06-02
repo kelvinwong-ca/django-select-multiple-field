@@ -79,12 +79,12 @@ class Tester(Command):
             print("Please install Django => 1.4.2 to run the test suite")
             exit(-1)
         from test_suite import (
-            test_codecs, test_models)
+            test_codecs, test_models, test_widgets)
             #test_forms, test_models, test_widgets)
         suite = defaultTestLoader.loadTestsFromModule(test_codecs)
         # suite.addTests(defaultTestLoader.loadTestsFromModule(test_forms))
         suite.addTests(defaultTestLoader.loadTestsFromModule(test_models))
-        # suite.addTests(defaultTestLoader.loadTestsFromModule(test_widgets))
+        suite.addTests(defaultTestLoader.loadTestsFromModule(test_widgets))
         runner = TextTestRunner()
         result = runner.run(suite)
         if result.wasSuccessful() is not True:
