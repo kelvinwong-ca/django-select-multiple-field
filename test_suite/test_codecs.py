@@ -30,6 +30,11 @@ class CodecTestCase(SimpleTestCase):
         decoded = decode_csv_to_list('')
         self.assertEqual(decoded, [])
 
+    def test_decoder_on_single_encoded_character(self):
+        single_encoded = self.choices[1][0]
+        decoded = decode_csv_to_list(single_encoded)
+        self.assertEqual(decoded, [single_encoded])
+
     def test_decoder_deduplicates(self):
         decoded = decode_csv_to_list(self.test_encoded + ',b,c,c')
         self.assertEqual(decoded, self.test_list)
