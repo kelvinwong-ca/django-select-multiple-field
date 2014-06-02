@@ -12,13 +12,16 @@ except ImportError:
         return format_string.format(*args, **kwargs)
 
 
+HTML_ATTR_CLASS = 'select-multiple-field'
+
+
 class SelectMultipleField(widgets.SelectMultiple):
     """Multiple select widget ready for jQuery multiselect.js"""
 
     allow_multiple_selected = True
 
-    def render(self, name, value, attrs=None, choices=()):
-        rendered_attrs = {'class': 'select-multiple-field'}
+    def render(self, name, value, attrs={}, choices=()):
+        rendered_attrs = {'class': HTML_ATTR_CLASS}
         rendered_attrs.update(attrs)
         if value is None:
             value = []
