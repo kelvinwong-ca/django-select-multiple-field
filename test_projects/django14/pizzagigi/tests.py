@@ -38,7 +38,23 @@ class PizzaCreateViewTestCase(TestCase):
         response = self.client.get(reverse('pizza:create'))
         self.assertEqual(response.status_code, 200)
 
-    def test_creation(self):
+    def test_creation_single(self):
+        data = {
+            'toppings': [Pizza.MOZZARELLA]
+        }
+        response = self.client.post(
+            reverse('pizza:create'),
+            urlencode(MultiValueDict(data), doseq=True),
+            content_type='application/x-www-form-urlencoded'
+            )
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(
+            response,
+            'http://testserver' + reverse('pizza:created'))
+        p = Pizza.objects.all()[0]
+        self.assertIn(Pizza.MOZZARELLA, p.toppings)
+
+    def test_creation_multiple(self):
         data = {
             'toppings': [Pizza.MOZZARELLA, Pizza.PEPPERONI]
         }
@@ -52,8 +68,8 @@ class PizzaCreateViewTestCase(TestCase):
             response,
             'http://testserver' + reverse('pizza:created'))
         p = Pizza.objects.all()[0]
-        self.assertTrue(Pizza.MOZZARELLA in p.toppings)
-        self.assertTrue(Pizza.PEPPERONI in p.toppings)
+        self.assertIn(Pizza.MOZZARELLA, p.toppings)
+        self.assertIn(Pizza.PEPPERONI, p.toppings)
 
 
 class PizzaDetailViewTestCase(TestCase):
