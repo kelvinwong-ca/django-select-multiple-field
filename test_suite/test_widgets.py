@@ -1,10 +1,9 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 from django.forms import widgets
 from django.test import SimpleTestCase
 from django.utils.datastructures import MergeDict, MultiValueDict
-from django.utils.http import urlencode
 
 from select_multiple_field.widgets import (
     HTML_ATTR_CLASS, SelectMultipleField)

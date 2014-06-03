@@ -36,3 +36,13 @@ class SelectMultipleField(widgets.SelectMultiple):
 
         output.append('</select>')
         return mark_safe('\n'.join(output))
+
+    def value_from_datadict(self, data, files, name):
+        """
+        SelectMultipleField widget delegates processing of raw user data to
+        Django's SelectMultiple widget
+
+        Returns list or None
+        """
+        return super(SelectMultipleField, self).value_from_datadict(
+            data, files, name)
