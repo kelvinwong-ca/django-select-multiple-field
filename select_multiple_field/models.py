@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.conf import settings
 from django.core import exceptions, validators
 from django.db import models
 from django.utils import six
@@ -17,11 +16,16 @@ DEFAULT_DELIMITER = ','
 
 
 @python_2_unicode_compatible
-class SelectMultipleField(models.Field):
+class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
+                                             models.Field)):
     """Stores multiple selection choices as serialized list"""
 
+    default_error_messages = {
+        'invalid_type': _(
+            "Types passed as value must be string, list, tuple or None, "
+            "not '%(value)s'."),
+    }
     description = _('Select multiple field')
-    __metaclass__ = models.SubfieldBase
 
     def __init__(self, *args, **kwargs):
         """
@@ -42,19 +46,27 @@ class SelectMultipleField(models.Field):
         """
         When SelectMultipleField is assigned a value, this method coerces
         into a list usable by Python
+
+        value is Encoded strings from the database or Python native types in
+        need of validation
+
+        Returns list
         """
-        delimiter = getattr(
-            settings, 'SELECTMULTIPLEFIELD_DELIMITER', DEFAULT_DELIMITER)
-        if isinstance(value, six.string_types):
-            pyval = decode_csv_to_list(value)
-            return pyval
-        elif value is None:
-            return value
-        if isinstance(value, (list, tuple)):
+        if value is None:
             return value
 
-        raise Exception('End of Model.to_python')
-        return delimiter.join(value)
+        elif isinstance(value, (list, tuple)):
+            return value
+
+        elif isinstance(value, six.string_types):
+            #
+            # Strings are always encoded choices
+            #
+            native = decode_csv_to_list(value)
+            return native
+
+        msg = self.error_messages['invalid_type'] % {'value': type(value)}
+        raise exceptions.ValidationError(msg)
 
     def get_prep_value(self, value):
         """
@@ -62,15 +74,20 @@ class SelectMultipleField(models.Field):
 
         This takes a Python list and encodes it into a form storable in the
         database
+
+        Returns a string or None
         """
+        if value is None:
+            return None
+
         return encode_list_to_csv(value)
 
-    def value_from_object(self, obj):
-        """
-        Returns the value of this field in the given model instance.
-        """
-        value = getattr(obj, self.attname)
-        return value
+    # def value_from_object(self, obj):
+    #     """
+    #     Returns the value of this field in the given model instance.
+    #     """
+    #     value = getattr(obj, self.attname)
+    #     return value
 
     def get_choices(self, **kwargs):
         """
