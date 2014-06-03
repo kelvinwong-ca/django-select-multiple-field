@@ -1,10 +1,10 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 from django.test import SimpleTestCase
 
 from select_multiple_field.codecs import (
-    DEFAULT_DELIMITER, decode_csv_to_list, encode_list_to_csv)
+    decode_csv_to_list, encode_list_to_csv)
 
 
 class CodecTestCase(SimpleTestCase):
@@ -50,7 +50,7 @@ class CodecTestCase(SimpleTestCase):
         encoded = encode_list_to_csv(self.test_list[0:1])
         self.assertEqual(encoded, self.test_encoded[0:1])
 
-    def test_encoder_on_empty_string(self):
+    def test_encoder_on_empty_list(self):
         encoded = encode_list_to_csv([])
         self.assertEqual(encoded, '')
 
