@@ -56,9 +56,23 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         self.assertEquals(item.to_python([]), [])
 
     def test_to_python_list(self):
-        item = SelectMultipleField()
+        item = SelectMultipleField(choices=self.choices)
+        self.assertTrue(item.choices)
         self.assertIsInstance(item.to_python(self.choices_list), list)
         self.assertEquals(item.to_python(self.choices_list), self.choices_list)
+
+    def test_to_python_list_w_invalid_value(self):
+        item = SelectMultipleField(choices=self.choices)
+        self.assertTrue(item.choices)
+        invalid_list = ['InvalidChoice']
+        with self.assertRaises(ValidationError) as cm:
+            item.to_python(invalid_list)
+
+        self.assertEqual(
+            cm.exception.messages[0],
+            (SelectMultipleField.default_error_messages['invalid_choice']
+                % {'value': invalid_list[0]})
+        )
 
     def test_to_python_empty_string(self):
         item = SelectMultipleField()
@@ -93,3 +107,29 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
             cm.exception.messages[0],
             (SelectMultipleField.default_error_messages['invalid_type']
                 % {'value': type(invalid_type)}))
+
+    def test_validate_options_list_true(self):
+        item = SelectMultipleField(choices=self.choices)
+        value = self.choices_list
+        self.assertTrue(item.validate_options_list(value))
+
+    def test_validate_options_list_raises_validationerror(self):
+        item = SelectMultipleField(choices=self.choices)
+        value = ['InvalidChoice']
+        with self.assertRaises(ValidationError) as cm:
+            self.assertTrue(item.validate_options_list(value))
+
+        self.assertEqual(
+            cm.exception.messages[0],
+            (SelectMultipleField.default_error_messages['invalid_choice']
+                % {'value': value[0]})
+        )
+
+    def test_validate_choice_true(self):
+        item = SelectMultipleField(choices=self.choices)
+        for n in range(len(self.choices_list) - 1):
+            self.assertTrue(item.validate_option(self.choices_list[n]))
+
+    def test_validate_choice_false(self):
+        item = SelectMultipleField(choices=self.choices)
+        self.assertFalse(item.validate_option("InvalidChoice"))

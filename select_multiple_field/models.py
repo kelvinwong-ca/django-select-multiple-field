@@ -24,6 +24,10 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
         'invalid_type': _(
             "Types passed as value must be string, list, tuple or None, "
             "not '%(value)s'."),
+        'invalid_choice': _(
+            "Select a valid choice. %(value)s is not one of the available "
+            "choices."
+        ),
     }
     description = _('Select multiple field')
 
@@ -50,12 +54,15 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
         value is Encoded strings from the database or Python native types in
         need of validation
 
+        Raises ValidationError if value is not in choices or if invalid type
+
         Returns list
         """
         if value is None:
             return value
 
         elif isinstance(value, (list, tuple)):
+            self.validate_options_list(value)
             return value
 
         elif isinstance(value, six.string_types):
@@ -134,6 +141,28 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
 
         if not self.blank and value in validators.EMPTY_VALUES:
             raise exceptions.ValidationError(self.error_messages['blank'])
+
+    def validate_options_list(self, value):
+        """
+        Checks that all options in value list are in choices
+
+        Raises ValidationError if an option in value list is not in choices
+
+        Returns boolean True if all values are in choices
+        """
+        for option in value:
+            if not self.validate_option(option):
+                msg = self.error_messages['invalid_choice'] % {'value': option}
+                raise exceptions.ValidationError(msg)
+
+        return True
+
+    def validate_option(self, value):
+        """
+        Checks that value is in choices
+        """
+        choices = dict(self.get_choices())
+        return value in choices.keys()
 
     def formfield(self, **kwargs):
         """
