@@ -19,16 +19,16 @@ class SelectMultipleFormField(fields.MultipleChoiceField):
     widget = SelectMultipleField
 
     def __init__(
-            self, max_length=None, max_choices=None, size=4,
+            self, max_length=None, size=4, max_choices=None,
             max_choices_attr=DEFAULT_MAX_CHOICES_ATTR,
             *args, **kwargs):
         """
         max_length refers to number of characters used to store the encoded
         list of choices (est. 2n - 1)
 
-        max_choices is the maximum number of choices allowed by the field
-
         size is the HTML element size attribute passed to the widget
+
+        max_choices is the maximum number of choices allowed by the field
 
         max_choices_attr is a string used as an attribute name in the widget
         representation of max_choices (currently a data attribute)
