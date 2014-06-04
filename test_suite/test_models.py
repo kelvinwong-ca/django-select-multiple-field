@@ -22,6 +22,10 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         item = SelectMultipleField()
         self.assertIsInstance(item, Field)
 
+    def test_get_internal_type(self):
+        item = SelectMultipleField()
+        self.assertEquals(item.get_internal_type(), "CharField")
+
     def test_get_prep_value_none(self):
         """None stored as NULL in db"""
         item = SelectMultipleField()
