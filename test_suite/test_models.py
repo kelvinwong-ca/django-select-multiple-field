@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import string
 
 from django.core.exceptions import ValidationError
-from django.db.models.fields import Field
+from django.db.models.fields import CharField, Field
 from django.test import SimpleTestCase
 from django.utils import six
 
@@ -24,7 +24,9 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
 
     def test_get_internal_type(self):
         item = SelectMultipleField()
-        self.assertEquals(item.get_internal_type(), "CharField")
+        charfield = CharField()
+        self.assertEquals(item.get_internal_type(),
+                          charfield.get_internal_type())
 
     def test_get_prep_value_none(self):
         """None stored as NULL in db"""
