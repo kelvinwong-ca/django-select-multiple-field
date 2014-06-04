@@ -43,6 +43,8 @@ class SelectMultipleFormField(fields.MultipleChoiceField):
         self.size, self.max_choices_attr = size, max_choices_attr
         self.coerce = kwargs.pop('coerce', lambda val: val)
         self.empty_value = kwargs.pop('empty_value', [])
+        if not hasattr(self, 'empty_values'):
+            self.empty_values = list(validators.EMPTY_VALUES)
         super(SelectMultipleFormField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
@@ -54,8 +56,8 @@ class SelectMultipleFormField(fields.MultipleChoiceField):
 
         Method also handles lists and strings
         """
-        if value in validators.EMPTY_VALUES:
-            return []
+        if (value == self.empty_value) or (value in self.empty_values):
+            return self.empty_value
 
         if isinstance(value, six.string_types):
             if len(value) == 0:
