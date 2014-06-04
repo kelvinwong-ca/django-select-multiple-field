@@ -14,7 +14,7 @@ DEFAULT_DELIMITER = ','
 DEFAULT_MAX_CHOICES_ATTR = 'data-max-choices'
 
 
-class SelectMultipleFormField(fields.TypedMultipleChoiceField):
+class SelectMultipleFormField(fields.MultipleChoiceField):
 
     widget = SelectMultipleField
 
@@ -24,6 +24,8 @@ class SelectMultipleFormField(fields.TypedMultipleChoiceField):
             *args, **kwargs):
         self.max_length, self.max_choices = max_length, max_choices
         self.size, self.max_choices_attr = size, max_choices_attr
+        self.coerce = kwargs.pop('coerce', lambda val: val)
+        self.empty_value = kwargs.pop('empty_value', [])
         kwargs.setdefault('widget', self.widget)
         super(SelectMultipleFormField, self).__init__(*args, **kwargs)
 
