@@ -22,6 +22,23 @@ class SelectMultipleFormField(fields.MultipleChoiceField):
             self, max_length=None, max_choices=None, size=4,
             max_choices_attr=DEFAULT_MAX_CHOICES_ATTR,
             *args, **kwargs):
+        """
+        max_length refers to number of characters used to store the encoded
+        list of choices (est. 2n - 1)
+
+        max_choices is the maximum number of choices allowed by the field
+
+        size is the HTML element size attribute passed to the widget
+
+        max_choices_attr is a string used as an attribute name in the widget
+        representation of max_choices (currently a data attribute)
+
+        coerce is bound to ModelField.to_python method when using
+        ModelViewMixin, otherwise it returns what is passed (the identity
+        function)
+
+        empty_value is the value used to represent an empty field
+        """
         self.max_length, self.max_choices = max_length, max_choices
         self.size, self.max_choices_attr = size, max_choices_attr
         self.coerce = kwargs.pop('coerce', lambda val: val)
