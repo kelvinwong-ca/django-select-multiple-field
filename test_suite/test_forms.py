@@ -21,6 +21,7 @@ class SelectMultipleFormFieldTestCase(SimpleTestCase):
     def test_instantiation(self):
         ff = SelectMultipleFormField()
         self.assertIsInstance(ff, fields.Field)
+        self.assertIsInstance(ff, fields.MultipleChoiceField)
 
     def test_widget_class(self):
         ff = SelectMultipleFormField()
