@@ -43,7 +43,6 @@ class SelectMultipleFormField(fields.MultipleChoiceField):
         self.size, self.max_choices_attr = size, max_choices_attr
         self.coerce = kwargs.pop('coerce', lambda val: val)
         self.empty_value = kwargs.pop('empty_value', [])
-        kwargs.setdefault('widget', self.widget)
         super(SelectMultipleFormField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
