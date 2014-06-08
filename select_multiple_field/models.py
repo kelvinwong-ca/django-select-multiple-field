@@ -26,8 +26,8 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
             "not '%(value)s'."),
         'invalid_choice': _(
             "Select a valid choice. %(value)s is not one of the available "
-            "choices."
-        ),
+            "choices."),
+        'null': _("This field cannot be null."),
     }
     description = _('Select multiple field')
 
@@ -116,6 +116,7 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
         if not self.editable:
             # Skip validation for non-editable fields.
             return
+
         if self._choices and value:
             if isinstance(value, (list, tuple)):
                 bad_values = []
@@ -124,16 +125,9 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
                         bad_values.append(opt)
                 if len(bad_values) == 0:
                     return
-
-            for option_key, option_value in self.choices:
-                if isinstance(option_value, (list, tuple)):
-                    # This is an optgroup, so look inside the group for
-                    # options.
-                    for optgroup_key, optgroup_value in option_value:
-                        if value == optgroup_key:
-                            return
-                elif value == option_key:
-                    return
+                else:
+                    msg = self.error_messages['invalid_choice'] % {'value': bad_values}
+                    raise exceptions.ValidationError(msg)
 
             msg = self.error_messages['invalid_choice'] % {'value': value}
             raise exceptions.ValidationError(msg)
