@@ -21,6 +21,7 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
     """Stores multiple selection choices as serialized list"""
 
     default_error_messages = {
+        'blank': _("This field cannot be blank."),
         'invalid_type': _(
             "Types passed as value must be string, list, tuple or None, "
             "not '%(value)s'."),
@@ -144,14 +145,14 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
 
         Raises ValidationError if an option in value list is not in choices
 
-        Returns boolean True if all values are in choices
+        Returns None if all values are in choices
         """
         for option in value:
             if not self.validate_option(option):
                 msg = self.error_messages['invalid_choice'] % {'value': option}
                 raise exceptions.ValidationError(msg)
 
-        return True
+        return
 
     def validate_option(self, value):
         """

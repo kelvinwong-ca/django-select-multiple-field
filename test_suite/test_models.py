@@ -134,6 +134,20 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
     def test_validate_invalid_choice(self):
         item = SelectMultipleField(choices=self.choices)
         item.editable = True
+        value = ["Invalid Choice"]
+        instance = "Fake Unused Instance"
+        with self.assertRaises(ValidationError) as cm:
+            self.assertTrue(item.validate(value, instance))
+
+        self.assertEqual(
+            cm.exception.messages[0],
+            (SelectMultipleField.default_error_messages['invalid_choice']
+                % {'value': value})
+        )
+
+    def test_validate_invalid_string(self):
+        item = SelectMultipleField(choices=self.choices)
+        item.editable = True
         value = "Invalid Choice"
         instance = "Fake Unused Instance"
         with self.assertRaises(ValidationError) as cm:
@@ -159,10 +173,24 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
             SelectMultipleField.default_error_messages['null']
         )
 
-    def test_validate_options_list_true(self):
+    def test_validate_not_blank(self):
+        item = SelectMultipleField(choices=self.choices)
+        item.editable = True
+        item.blank = False
+        value = []
+        instance = "Fake Unused Instance"
+        with self.assertRaises(ValidationError) as cm:
+            self.assertTrue(item.validate(value, instance))
+
+        self.assertEqual(
+            cm.exception.messages[0],
+            SelectMultipleField.default_error_messages['blank']
+        )
+
+    def test_validate_options_list(self):
         item = SelectMultipleField(choices=self.choices)
         value = self.choices_list
-        self.assertTrue(item.validate_options_list(value))
+        self.assertIs(item.validate_options_list(value), None)
 
     def test_validate_options_list_raises_validationerror(self):
         item = SelectMultipleField(choices=self.choices)
