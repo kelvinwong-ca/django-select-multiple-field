@@ -90,13 +90,6 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
 
         return encode_list_to_csv(value)
 
-    # def value_from_object(self, obj):
-    #     """
-    #     Returns the value of this field in the given model instance.
-    #     """
-    #     value = getattr(obj, self.attname)
-    #     return value
-
     def get_choices(self, **kwargs):
         """
         Choices from model without initial blank choices
