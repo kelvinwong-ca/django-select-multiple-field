@@ -98,7 +98,9 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
 
     def get_choices(self, **kwargs):
         """
-        Choices without initial blank choices
+        Choices from model without initial blank choices
+
+        ie Stop widget from producing <option value="">---------</option>
         """
         field_options = {
             'include_blank': False

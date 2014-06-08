@@ -108,6 +108,17 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
             (SelectMultipleField.default_error_messages['invalid_type']
                 % {'value': type(invalid_type)}))
 
+    def test_get_choices(self):
+        """Overridden get_choices suppresses blank choice tuple"""
+        item = SelectMultipleField(choices=self.choices)
+        choices = item.get_choices()
+        self.assertIsInstance(choices, list)
+        self.assertIsInstance(choices[0], tuple)
+        self.assertNotIn(('', '---------'), choices)
+
+    def test_validate(self):
+        pass
+
     def test_validate_options_list_true(self):
         item = SelectMultipleField(choices=self.choices)
         value = self.choices_list
