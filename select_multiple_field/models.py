@@ -156,7 +156,9 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
 
     def formfield(self, **kwargs):
         """
-        This returns the right formclass without calling super
+        This returns the correct formclass without calling super
+
+        Returns select_multiple_field.forms.SelectMultipleFormField
         """
         defaults = {'required': not self.blank,
                     'label': capfirst(self.verbose_name),
@@ -167,6 +169,7 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
                 defaults['show_hidden_initial'] = True
             else:
                 defaults['initial'] = self.get_default()
+
         if self.choices:
             # Fields with choices get special treatment.
             include_blank = (self.blank or
@@ -178,11 +181,12 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
 
             # Many of the subclass-specific formfield arguments (min_value,
             # max_value) don't apply for choice fields, so be sure to only pass
-            # the values that TypedChoiceField will understand.
+            # the values that SelectMultipleFormField will understand.
             for k in kwargs.keys():
                 if k not in ('coerce', 'empty_value', 'choices', 'required',
                              'widget', 'label', 'initial', 'help_text',
                              'error_messages', 'show_hidden_initial'):
                     del kwargs[k]
+
         defaults.update(kwargs)
         return forms.SelectMultipleFormField(**defaults)

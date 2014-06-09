@@ -9,7 +9,12 @@ from django.test import SimpleTestCase
 from django.utils import six
 
 from select_multiple_field.codecs import encode_list_to_csv
+from select_multiple_field.forms import SelectMultipleFormField
 from select_multiple_field.models import SelectMultipleField
+
+
+class FakeCallableDefault:
+    pass
 
 
 class SelectMultipleFieldTestCase(SimpleTestCase):
@@ -212,3 +217,33 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
     def test_validate_choice_false(self):
         item = SelectMultipleField(choices=self.choices)
         self.assertFalse(item.validate_option("InvalidChoice"))
+
+    def test_formfield(self):
+        item = SelectMultipleField()
+        form = item.formfield()
+        self.assertIsInstance(form, SelectMultipleFormField)
+
+    def test_formfield_default_is_callable(self):
+        item = SelectMultipleField(default=FakeCallableDefault)
+        form = item.formfield()
+        self.assertIsInstance(form, SelectMultipleFormField)
+        self.assertTrue(item.has_default())
+        self.assertTrue(callable(form.initial))
+        self.assertIs(form.initial, FakeCallableDefault)
+
+    def test_formfield_default_string(self):
+        string_default = "String As Default"
+        item = SelectMultipleField(default=string_default)
+        form = item.formfield()
+        self.assertIsInstance(form, SelectMultipleFormField)
+        self.assertTrue(item.has_default())
+        self.assertEqual(item.get_default(), string_default)
+        self.assertEqual(form.initial, string_default)
+
+    def test_formfield_choices(self):
+        item = SelectMultipleField(choices=self.choices)
+        form = item.formfield()
+        self.assertIsInstance(form, SelectMultipleFormField)
+        self.assertEqual(form.coerce, item.to_python)
+        self.assertEqual(form.empty_value, [])
+        self.assertNotIn(('', '---------'), form.choices)
