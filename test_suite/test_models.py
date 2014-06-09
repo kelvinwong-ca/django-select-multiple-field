@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import string
 
 from django.core.exceptions import ValidationError
-from django.db.models.fields import CharField, Field
+from django.db.models.fields import BLANK_CHOICE_DASH, CharField, Field
 from django.test import SimpleTestCase
 from django.utils import six
 
@@ -119,7 +119,7 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         choices = item.get_choices()
         self.assertIsInstance(choices, list)
         self.assertIsInstance(choices[0], tuple)
-        self.assertNotIn(('', '---------'), choices)
+        self.assertNotIn(('', BLANK_CHOICE_DASH), choices)
 
     def test_validate_valid_choices(self):
         item = SelectMultipleField(choices=self.choices)
@@ -241,9 +241,13 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         self.assertEqual(form.initial, string_default)
 
     def test_formfield_choices(self):
+        """
+        Formfield returns no empty value by default
+        """
         item = SelectMultipleField(choices=self.choices)
         form = item.formfield()
         self.assertIsInstance(form, SelectMultipleFormField)
         self.assertEqual(form.coerce, item.to_python)
         self.assertEqual(form.empty_value, [])
-        self.assertNotIn(('', '---------'), form.choices)
+        print item.blank, item.null
+        self.assertNotIn(('', BLANK_CHOICE_DASH), form.choices)
