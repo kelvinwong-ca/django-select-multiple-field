@@ -249,5 +249,4 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         self.assertIsInstance(form, SelectMultipleFormField)
         self.assertEqual(form.coerce, item.to_python)
         self.assertEqual(form.empty_value, [])
-        print item.blank, item.null
         self.assertNotIn(('', BLANK_CHOICE_DASH), form.choices)
