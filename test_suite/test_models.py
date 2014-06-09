@@ -119,7 +119,19 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         choices = item.get_choices()
         self.assertIsInstance(choices, list)
         self.assertIsInstance(choices[0], tuple)
-        self.assertNotIn(('', BLANK_CHOICE_DASH), choices)
+        self.assertNotIn(BLANK_CHOICE_DASH[0], choices)
+        choices = item.get_choices(include_blank=False)
+        self.assertIsInstance(choices, list)
+        self.assertIsInstance(choices[0], tuple)
+        self.assertNotIn(BLANK_CHOICE_DASH[0], choices)
+
+    def test_get_choices_w_blank_choice(self):
+        """Overridden get_choices suppresses blank choice tuple"""
+        item = SelectMultipleField(choices=self.choices)
+        choices = item.get_choices(include_blank=True)
+        self.assertIsInstance(choices, list)
+        self.assertIsInstance(choices[0], tuple)
+        self.assertIn(BLANK_CHOICE_DASH[0], choices)
 
     def test_validate_valid_choices(self):
         item = SelectMultipleField(choices=self.choices)
@@ -240,13 +252,31 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         self.assertEqual(item.get_default(), string_default)
         self.assertEqual(form.initial, string_default)
 
-    def test_formfield_choices(self):
+    def test_formfield_no_empty_value_by_default(self):
         """
         Formfield returns no empty value by default
         """
         item = SelectMultipleField(choices=self.choices)
         form = item.formfield()
         self.assertIsInstance(form, SelectMultipleFormField)
+        self.assertFalse(item.has_default())
         self.assertEqual(form.coerce, item.to_python)
+        self.assertFalse(item.blank)
+        self.assertTrue(form.required)
+        self.assertFalse(item.null)
         self.assertEqual(form.empty_value, [])
-        self.assertNotIn(('', BLANK_CHOICE_DASH), form.choices)
+        self.assertNotIn(BLANK_CHOICE_DASH[0], form.choices)
+
+    def test_formfield_empty_value_w_blank(self):
+        """
+        Formfield can return empty value, set ModelField.blank to True
+        """
+        item = SelectMultipleField(choices=self.choices, blank=True)
+        form = item.formfield()
+        self.assertIsInstance(form, SelectMultipleFormField)
+        self.assertEqual(form.coerce, item.to_python)
+        self.assertTrue(item.blank)
+        self.assertFalse(form.required)
+        self.assertFalse(item.null)
+        self.assertEqual(form.empty_value, [])
+        self.assertIn(BLANK_CHOICE_DASH[0], form.choices)

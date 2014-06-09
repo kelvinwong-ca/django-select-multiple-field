@@ -99,8 +99,8 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
         field_options = {
             'include_blank': False
         }
-        kwargs.update(field_options)
-        return super(SelectMultipleField, self).get_choices(**kwargs)
+        field_options.update(kwargs)
+        return super(SelectMultipleField, self).get_choices(**field_options)
 
     def validate(self, value, model_instance):
         """
@@ -171,9 +171,10 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
                 defaults['initial'] = self.get_default()
 
         if self.choices:
-            # Fields with choices get special treatment.
-            include_blank = (self.blank or
-                             not (self.has_default() or 'initial' in kwargs))
+            # Django normally includes an empty choice if blank, has_default
+            # and initial are all False, we are intentially breaking this
+            # convention
+            include_blank = self.blank
             defaults['choices'] = self.get_choices(include_blank=include_blank)
             defaults['coerce'] = self.to_python
             if self.null:
