@@ -4,11 +4,6 @@ django-select-multiple-field
 
 Select multiple choices in a single Django model field.
 
-.. warning::
-
-    This Django module is not suitable for production use.
-    It has not been sufficiently tested.
-
 Quick Start
 ===========
 
