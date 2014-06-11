@@ -4,6 +4,8 @@ django-select-multiple-field
 
 Select multiple choices in a single Django model field.
 
+.. figure:: https://github.com/kelvinwong-ca/django-select-multiple-field/raw/master/docs/images/select_multiple_cropped.jpg
+
 Quick Start
 ===========
 
