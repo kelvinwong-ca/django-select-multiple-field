@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns('',  # NOQA
 
     url(r'^$', TemplateView.as_view(
         template_name='app/home.html'), name='home'),
