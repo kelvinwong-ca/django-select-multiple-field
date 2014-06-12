@@ -12,6 +12,8 @@ from select_multiple_field.models import SelectMultipleField
 
 @python_2_unicode_compatible
 class Pizza(models.Model):
+    """Pizza demonstrates minimal use-case"""
+
     ANCHOVIES = 'a'
     BLACK_OLIVES = 'b'
     CHEDDAR_CHEESE = 'c'
