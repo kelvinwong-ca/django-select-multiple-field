@@ -3,8 +3,7 @@ from django.views.generic import TemplateView
 
 from .views import (
     PizzaCreateView, PizzaDeleteView, PizzaDetailView, PizzaListView,
-    PizzaUpdateView,
-    ChickenWingsListView
+    PizzaUpdateView
 )
 
 urlpatterns = patterns('',  # NOQA
@@ -20,7 +19,5 @@ urlpatterns = patterns('',  # NOQA
     url(r'^delete/(?P<pk>[0-9]*)$', PizzaDeleteView.as_view(), name='delete'),
     url(r'^deleted/$', TemplateView.as_view(
         template_name='pizzagigi/pizza_deleted.html'), name='deleted'),
-
-    url(r'^wings/$', ChickenWingsListView.as_view(), name='chickenwings_list'),
 
 )
