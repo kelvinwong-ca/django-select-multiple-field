@@ -6,6 +6,10 @@ Select multiple choices in a single Django model field.
 
 .. figure:: https://github.com/kelvinwong-ca/django-select-multiple-field/raw/master/docs/images/select_multiple_cropped.jpg
 
+   Rendered using the multiselect.js plugin for jQuery [#]_
+
+.. [#] jquery.multi-select.js https://github.com/lou/multi-select
+
 Quick Start
 ===========
 
