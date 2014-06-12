@@ -38,6 +38,9 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
 
         By default responses are required, so 'blank' is False
         """
+        if 'max_choices' in kwargs:
+            self.max_choices = kwargs.pop('max_choices')
+
         super(SelectMultipleField, self).__init__(*args, **kwargs)
         self.validators.append(validators.MaxLengthValidator(self.max_length))
 

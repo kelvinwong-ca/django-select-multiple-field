@@ -27,6 +27,11 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         item = SelectMultipleField()
         self.assertIsInstance(item, Field)
 
+    def test_instantiation_max_choices(self):
+        for max_choices in range(25):
+            item = SelectMultipleField(max_choices=max_choices)
+            self.assertEqual(item.max_choices, max_choices)
+
     def test_get_internal_type(self):
         item = SelectMultipleField()
         charfield = CharField()
