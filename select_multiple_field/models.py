@@ -118,7 +118,7 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
             if isinstance(value, (list, tuple)):
                 bad_values = []
                 for opt in value:
-                    if opt not in [choice[0] for choice in self.choices]:
+                    if opt not in self.get_choices_keys():
                         bad_values.append(opt)
                 if len(bad_values) == 0:
                     return
