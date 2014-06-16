@@ -161,12 +161,13 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         self.assertIn(BLANK_CHOICE_DASH[0], choices)
 
     def test_validate_valid_choices(self):
-        item = SelectMultipleField(choices=self.choices)
-        item.editable = True
-        instance = "Fake Unused Instance"
-        for i, v in enumerate(self.choices_list):
-            subset = self.choices_list[0: i + 1]
-            self.assertIs(item.validate(subset, instance), None)
+        for choices in self.test_choices:
+            item = SelectMultipleField(choices=choices[0])
+            item.editable = True
+            instance = "Fake Unused Instance"
+            for i, v in enumerate(choices[1]):
+                subset = self.choices_list[0: i + 1]
+                self.assertIs(item.validate(subset, instance), None)
 
     def test_validate_not_editable(self):
         item = SelectMultipleField()
