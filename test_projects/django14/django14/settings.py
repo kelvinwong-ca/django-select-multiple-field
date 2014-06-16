@@ -128,6 +128,7 @@ TEMPLATE_DIRS = (
 INSTALLED_APPS = (
     'select_multiple_field',
     'pizzagigi',
+    'forthewing',
 
     'django.contrib.auth',
     'django.contrib.contenttypes',
