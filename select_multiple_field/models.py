@@ -123,7 +123,8 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
                 if len(bad_values) == 0:
                     return
                 else:
-                    msg = self.error_messages['invalid_choice'] % {'value': bad_values}
+                    msg = self.error_messages['invalid_choice'] % {
+                        'value': bad_values}
                     raise exceptions.ValidationError(msg)
 
             msg = self.error_messages['invalid_choice'] % {'value': value}
@@ -150,12 +151,29 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
 
         return
 
+    def get_choices_keys(self, **kwargs):
+        """
+        Flattens choices and optgroup choices into a plain list of keys
+
+        Returns choices keys as list
+        """
+        flat_choices = []
+        choices = self.get_choices(**kwargs)
+        for key, val in choices:
+            if isinstance(val, (list, tuple)):
+                for opt_key, opt_val in val:
+                    flat_choices.append(opt_key)
+            else:
+                flat_choices.append(key)
+
+        return flat_choices
+
     def validate_option(self, value):
         """
         Checks that value is in choices
         """
-        choices = dict(self.get_choices())
-        return value in choices.keys()
+        flat_choices = self.get_choices_keys()
+        return value in flat_choices
 
     def formfield(self, **kwargs):
         """

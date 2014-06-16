@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import collections
 import string
 
 from django.core.exceptions import ValidationError
@@ -22,6 +23,26 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
     def setUp(self):
         self.choices = tuple([(c, c) for c in string.ascii_letters])
         self.choices_list = [c[0] for c in self.choices[0:len(self.choices)]]
+        #
+        # Make some optgroup choices
+        #
+        optgroups = collections.defaultdict(list)
+        self.num_optgroups = 5
+        for n, char in enumerate(string.ascii_letters):
+            optindex = n % self.num_optgroups
+            optgroups[string.ascii_letters[optindex]].append((char, char))
+
+        self.optgroup_choices = [(k, v) for k, v in optgroups.items()]
+
+        self.optgroup_choices_list = []
+        for group in self.optgroup_choices:
+            self.optgroup_choices_list.extend([k for k, v in group[1]])
+
+        self.optgroup_choices_list.sort()
+        self.test_choices = [
+            (self.choices, self.choices_list),
+            (self.optgroup_choices, self.optgroup_choices_list)
+        ]
 
     def test_instantiation(self):
         item = SelectMultipleField()
@@ -66,10 +87,11 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         self.assertEquals(item.to_python([]), [])
 
     def test_to_python_list(self):
-        item = SelectMultipleField(choices=self.choices)
-        self.assertTrue(item.choices)
-        self.assertIsInstance(item.to_python(self.choices_list), list)
-        self.assertEquals(item.to_python(self.choices_list), self.choices_list)
+        for choices, choices_list in self.test_choices:
+            item = SelectMultipleField(choices=choices)
+            self.assertTrue(item.choices)
+            self.assertIsInstance(item.to_python(choices_list), list)
+            self.assertEquals(item.to_python(choices_list), choices_list)
 
     def test_to_python_list_w_invalid_value(self):
         item = SelectMultipleField(choices=self.choices)
@@ -234,6 +256,17 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
     def test_validate_choice_false(self):
         item = SelectMultipleField(choices=self.choices)
         self.assertFalse(item.validate_option("InvalidChoice"))
+
+    def test_get_choices_keys(self):
+        item = SelectMultipleField(choices=self.choices)
+        self.assertEqual(item.get_choices_keys(), self.choices_list)
+
+    def test_get_choices_keys_optgroup(self):
+        item = SelectMultipleField(choices=self.optgroup_choices)
+        choices = item.get_choices_keys()
+        self.assertEqual(len(choices), len(self.optgroup_choices_list))
+        for n in choices:
+            self.assertIn(n, self.optgroup_choices_list)
 
     def test_formfield(self):
         item = SelectMultipleField()
