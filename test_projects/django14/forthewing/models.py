@@ -20,7 +20,7 @@ class ChickenWings(models.Model):
     MILD = 'M'
     CAJUN = 'c'
     JERK = 'j'
-    HONEY_GARLIC = 'h'
+    HONEY_GARLIC = 'g'
     HONEY_BBQ = 'H'
     THAI = 't'
     BACON = 'b'
