@@ -34,12 +34,15 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
 
     def __init__(self, *args, **kwargs):
         """
-        SelectMultipleField rejects items with no answer
+        SelectMultipleField rejects items with no answer by default
 
         By default responses are required, so 'blank' is False
         """
         if 'max_choices' in kwargs:
             self.max_choices = kwargs.pop('max_choices')
+
+        if 'include_blank' in kwargs:
+            self.include_blank = kwargs.pop('include_blank')
 
         super(SelectMultipleField, self).__init__(*args, **kwargs)
         self.validators.append(validators.MaxLengthValidator(self.max_length))
@@ -98,9 +101,18 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
         Choices from model without initial blank choices
 
         ie Stop widget from producing <option value="">---------</option>
+
+        If ModelField.include_blank is set then ignore any overrides sent via
+        kwargs
         """
+        include_blank = False
+        if hasattr(self, 'include_blank'):
+            include_blank = self.include_blank
+            if 'include_blank' in kwargs:
+                kwargs.pop('include_blank')
+
         field_options = {
-            'include_blank': False
+            'include_blank': include_blank
         }
         field_options.update(kwargs)
         return super(SelectMultipleField, self).get_choices(**field_options)

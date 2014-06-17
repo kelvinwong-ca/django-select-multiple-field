@@ -54,6 +54,12 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
             item = SelectMultipleField(max_choices=max_choices)
             self.assertEqual(item.max_choices, max_choices)
 
+    def test_instantiation_include_blank(self):
+        item = SelectMultipleField(include_blank=False)
+        self.assertFalse(item.include_blank)
+        item = SelectMultipleField(include_blank=True)
+        self.assertTrue(item.include_blank)
+
     def test_get_internal_type(self):
         item = SelectMultipleField()
         charfield = CharField()
@@ -160,6 +166,29 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         self.assertIsInstance(choices, list)
         self.assertIsInstance(choices[0], tuple)
         self.assertIn(BLANK_CHOICE_DASH[0], choices)
+
+    def test_get_choices_include_blank(self):
+        """
+        Explicit include_blank value is honored, ignoring passed parameters
+        """
+        item = SelectMultipleField(choices=self.choices, include_blank=True)
+        choices = item.get_choices()
+        self.assertIsInstance(choices, list)
+        self.assertIsInstance(choices[0], tuple)
+        self.assertIn(BLANK_CHOICE_DASH[0], choices)
+        choices = item.get_choices(include_blank=False)
+        self.assertIsInstance(choices, list)
+        self.assertIsInstance(choices[0], tuple)
+        self.assertIn(BLANK_CHOICE_DASH[0], choices)
+        item = SelectMultipleField(choices=self.choices, include_blank=False)
+        choices = item.get_choices()
+        self.assertIsInstance(choices, list)
+        self.assertIsInstance(choices[0], tuple)
+        self.assertNotIn(BLANK_CHOICE_DASH[0], choices)
+        choices = item.get_choices(include_blank=True)
+        self.assertIsInstance(choices, list)
+        self.assertIsInstance(choices[0], tuple)
+        self.assertNotIn(BLANK_CHOICE_DASH[0], choices)
 
     def test_validate_valid_choices(self):
         for choices in self.test_choices:
