@@ -1,6 +1,7 @@
 {% extends "forthewing/base.html" %}
 {% load url from future %}
 {% load i18n static %}
+{% load chickenwings_tags %}
 
 
 {% block page_title %}{% trans 'Chicken wings order' %} #{{ chickenwings.id }}{% endblock %}
@@ -25,7 +26,7 @@
 
   <ul>
     {% for flavour in chickenwings.flavour %}
-    <li>{{ flavour }}</li>
+    <li>{{ flavour|decode_flavour }}</li>
     {% empty %}
     <li>{% trans 'No sauce! Whaaa?' %}
     {% endfor %}

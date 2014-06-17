@@ -1,6 +1,7 @@
 {% extends "forthewing/base.html" %}
 {% load url from future %}
 {% load i18n static %}
+{% load chickenwings_tags %}
 
 
 {% block page_title %}{% trans 'Chicken wings' %}{% endblock %}
@@ -25,7 +26,7 @@
   {% if chickenwings %}
   <ul>
     {% for order in chickenwings %}
-    <li><a href="{% url 'ftw:detail' order.pk %}">{% trans 'Chicken wings order' %} #{{ order.pk }}</a>: {{ order.flavour }}</li>
+    <li><a href="{% url 'ftw:detail' order.pk %}">{% trans 'Chicken wings order' %} #{{ order.pk }}</a>: {{ order.flavour|decode_order }}</li>
     {% endfor %}
   </ul>
   {% else %}
