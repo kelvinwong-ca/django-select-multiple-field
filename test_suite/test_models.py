@@ -218,6 +218,14 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
             SelectMultipleField.default_error_messages['null']
         )
 
+    def test_validate_blank(self):
+        item = SelectMultipleField(choices=self.choices)
+        item.editable = True
+        item.blank = True
+        value = ['']
+        instance = "Fake Unused Instance"
+        self.assertIs(item.validate(value, instance), None)
+
     def test_validate_not_blank(self):
         item = SelectMultipleField(choices=self.choices)
         item.editable = True

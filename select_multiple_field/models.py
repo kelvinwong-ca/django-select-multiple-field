@@ -118,7 +118,9 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
             if isinstance(value, (list, tuple)):
                 bad_values = []
                 for opt in value:
-                    if opt not in self.get_choices_keys():
+                    if self.blank and opt in validators.EMPTY_VALUES:
+                        pass
+                    elif opt not in self.get_choices_keys():
                         bad_values.append(opt)
                 if len(bad_values) == 0:
                     return
@@ -172,6 +174,9 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
         """
         Checks that value is in choices
         """
+        if self.blank and value in validators.EMPTY_VALUES:
+            return True
+
         flat_choices = self.get_choices_keys()
         return value in flat_choices
 
