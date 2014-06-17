@@ -42,6 +42,7 @@ class ChickenWings(models.Model):
     )
     flavour = SelectMultipleField(
         blank=True,
+        include_blank=False,
         max_length=5,
         max_choices=2,
         choices=FLAVOUR_CHOICES
