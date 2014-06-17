@@ -3,7 +3,7 @@
 {% load i18n static %}
 
 
-{% block page_title %}{% trans 'Chicken wings order' %}{% endblock %}
+{% block page_title %}{% if chickenwings.id %}{% trans 'Update chicken wings' %} #{{ chickenwings.id }}{% else %}{% trans 'Create chicken wings' %}{% endif %}{% endblock %}
 
 
 {% block extra_head %}
@@ -18,8 +18,8 @@
 <ol class="breadcrumb">
   <li><a href="{% url 'home' %}">{% trans 'Home' %}</a></li>
   <li><a href="{% url 'ftw:list' %}">{% trans 'Chicken wings list' %}</a></li>
-  {% if wings.id %}
-  <li class="active">{% trans 'Update chicken wings' %} #{{ wings.id }}</li>
+  {% if chickenwings.id %}
+  <li class="active">{% trans 'Update chicken wings' %} #{{ chickenwings.id }}</li>
   {% else %}
   <li class="active">{% trans 'Create chicken wings' %}</li>
   {% endif %}
@@ -30,20 +30,20 @@
 
 {% block content %}
 
-  {% if wings.id %}
-  <h1>{% trans 'Update chicken wings' %} #{{ wings.id }}</h1>
+  {% if chickenwings.id %}
+  <h1>{% trans 'Update chicken wings' %} #{{ chickenwings.id }}</h1>
   {% else %}
   <h1>{% trans 'Create chicken wings' %}</h1>
   {% endif %}
 
 
-  <form action="{% if wings.id %}{% url 'ftw:update' pk=wings.id %}{% else %}{% url 'ftw:create' %}{% endif %}" method="post" accept-charset="utf-8" class="form-horizontal" role="form">
+  <form action="{% if chickenwings.id %}{% url 'ftw:update' pk=chickenwings.id %}{% else %}{% url 'ftw:create' %}{% endif %}" method="post" accept-charset="utf-8" class="form-horizontal" role="form">
     {% csrf_token %}
 
     
     {% if form.errors and form.flavour.errors %}
     <div class="form-group has-error">
-      <label for="id_toppings" class="col-sm-2 control-label">{% trans 'Flavour' %}</label>
+      <label for="id_flavour" class="col-sm-2 control-label">{% trans 'Flavour' %}</label>
       <div class="col-sm-10">
         {{ form.flavour }}
         {% for error in form.flavour.errors %}
@@ -62,7 +62,7 @@
 
     <div class="form-group">
       <div class="col-sm-offset-2 col-sm-10">
-        <button type="submit" class="btn btn-success btn-lg">{% if wings.id %}{% trans 'Update' %}{% else %}{% trans 'Create' %}{% endif %}</button>
+        <button type="submit" class="btn btn-success btn-lg">{% if chickenwings.id %}{% trans 'Update' %}{% else %}{% trans 'Create' %}{% endif %}</button>
       </div>
     </div>
 
