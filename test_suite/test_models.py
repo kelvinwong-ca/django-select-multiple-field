@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import collections
 import string
 
+from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db.models.fields import BLANK_CHOICE_DASH, CharField, Field
 from django.test import SimpleTestCase
@@ -257,14 +258,21 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
                 % {'value': value[0]})
         )
 
-    def test_validate_choice_true(self):
+    def test_validate_option_choice_true(self):
         item = SelectMultipleField(choices=self.choices)
         for n in range(len(self.choices_list) - 1):
             self.assertTrue(item.validate_option(self.choices_list[n]))
 
-    def test_validate_choice_false(self):
+    def test_validate_option_choice_false(self):
         item = SelectMultipleField(choices=self.choices)
         self.assertFalse(item.validate_option("InvalidChoice"))
+
+    def test_validate_option_choice_blank_values(self):
+        item = SelectMultipleField(choices=self.choices)
+        item.blank = True
+        self.assertTrue(item.blank)
+        for value in validators.EMPTY_VALUES:
+            self.assertTrue(item.validate_option(value))
 
     def test_get_choices_keys(self):
         item = SelectMultipleField(choices=self.choices)
