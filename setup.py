@@ -51,6 +51,7 @@ class DemoTester(Command):
             django.setup()
 
         call_command('test', 'pizzagigi', interactive=False, verbosity=1)
+        call_command('test', 'forthewing', interactive=False, verbosity=1)
 
 cmdclasses['test_demo'] = DemoTester
 

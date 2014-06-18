@@ -51,13 +51,13 @@ class ChickenWingsCreateViewTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(
             response,
-            'http://testserver' + reverse('pizza:created'))
+            'http://testserver' + reverse('ftw:created'))
         p = ChickenWings.objects.all()[0]
         self.assertIn(ChickenWings.JERK, p.flavour)
 
     def test_creation_multiple(self):
         data = {
-            'toppings': [ChickenWings.SUICIDE, ChickenWings.BOURBON]
+            'flavour': [ChickenWings.SUICIDE, ChickenWings.BOURBON]
         }
         response = self.client.post(
             reverse('ftw:create'),
@@ -68,7 +68,7 @@ class ChickenWingsCreateViewTestCase(TestCase):
         self.assertRedirects(
             response,
             'http://testserver' + reverse('ftw:created'))
-        p = Pizza.objects.all()[0]
+        p = ChickenWings.objects.all()[0]
         self.assertIn(ChickenWings.SUICIDE, p.flavour)
         self.assertIn(ChickenWings.BOURBON, p.flavour)
 
@@ -76,9 +76,9 @@ class ChickenWingsCreateViewTestCase(TestCase):
 class ChickenWingsModelTestCase(SimpleTestCase):
 
     def test_show_flavour(self):
-        for k, v in Pizza.TOPPING_CHOICES:
+        for k, v in ChickenWings.FLAVOUR_CHOICES:
             if isinstance(v, (list, tuple)):
-                for ko, vo in v[1]:
+                for ko, vo in v:
                     flavour_name = show_flavour(ko)
                     self.assertEqual(flavour_name, vo)
             else:
