@@ -74,6 +74,61 @@ class ChickenWingsCreateViewTestCase(TestCase):
         self.assertIn(ChickenWings.BOURBON, p.flavour)
 
 
+class ChickenWingsDetailViewTestCase(TestCase):
+
+    def setUp(self):
+        self.chickenwings = ChickenWings(flavour=[ChickenWings.HOT])
+        self.chickenwings.save()
+
+    def test_view(self):
+        response = self.client.get(
+            reverse('ftw:detail', args=[self.chickenwings.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object'], self.chickenwings)
+
+
+class ChickenWingsUpdateViewTestCase(TestCase):
+
+    def setUp(self):
+        self.chickenwings = ChickenWings(flavour=[ChickenWings.MEDIUM,
+                                                  ChickenWings.THAI])
+        self.chickenwings.save()
+
+    def test_change_flavour(self):
+        data = {
+            'flavour': [ChickenWings.MEDIUM, ChickenWings.BACON]
+        }
+        response = self.client.post(
+            reverse('ftw:update', args=[self.chickenwings.id]),
+            urlencode(MultiValueDict(data), doseq=True),
+            content_type='application/x-www-form-urlencoded')
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(
+            response,
+            'http://testserver' + reverse('ftw:updated'))
+        p = ChickenWings.objects.all()[0]
+        self.assertTrue(ChickenWings.MEDIUM in p.flavour)
+        self.assertFalse(ChickenWings.THAI in p.flavour)
+        self.assertTrue(ChickenWings.BACON in p.flavour)
+
+
+class ChickenWingsDeleteViewTestCase(TestCase):
+
+    def setUp(self):
+        self.chickenwings = ChickenWings(flavour=[ChickenWings.HONEY_GARLIC])
+        self.chickenwings.save()
+
+    def test_delete_chickenwings(self):
+        response = self.client.post(
+            reverse('ftw:delete', args=[self.chickenwings.id]))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(
+            response,
+            'http://testserver' + reverse('ftw:deleted'))
+        pl = ChickenWings.objects.all()
+        self.assertEqual(len(pl), 0)
+
+
 class ChickenWingsModelTestCase(SimpleTestCase):
 
     def test_show_flavour(self):
