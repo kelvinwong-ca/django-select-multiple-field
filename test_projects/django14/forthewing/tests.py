@@ -11,14 +11,14 @@ from .models import ChickenWings, show_flavour
 
 class ChickenWingsListViewTestCase(TestCase):
 
-    def test_no_pizzas(self):
+    def test_no_chickenwings(self):
         p = ChickenWings.objects.all()
         self.assertEqual(len(p), 0, 'Test requires no wings')
         response = self.client.get(reverse('ftw:list'))
         self.assertEqual(response.status_code, 200)
         self.assertTrue('No chicken wings found' in response.content.decode('utf-8'))
 
-    def test_many_pizzas(self):
+    def test_many_chickenwings(self):
         NUM_WINGS = 30
         wings = []
         for n in range(NUM_WINGS):
