@@ -48,15 +48,13 @@ class ChickenWingsCreateViewTestCase(TestCase):
             urlencode(MultiValueDict(data), doseq=True),
             content_type='application/x-www-form-urlencoded'
             )
-
-        self.assertEqual(response.status_code, 302)
         self.assertRedirects(
             response,
             'http://testserver' + reverse('ftw:created'))
         p = ChickenWings.objects.all()[0]
         self.assertIn(ChickenWings.JERK, p.flavour)
 
-    def test_creation_multiple(self):
+    def test_creation_two_choices(self):
         data = {
             'flavour': [ChickenWings.SUICIDE, ChickenWings.BOURBON]
         }
@@ -65,13 +63,25 @@ class ChickenWingsCreateViewTestCase(TestCase):
             urlencode(MultiValueDict(data), doseq=True),
             content_type='application/x-www-form-urlencoded'
             )
-        self.assertEqual(response.status_code, 302)
         self.assertRedirects(
             response,
             'http://testserver' + reverse('ftw:created'))
         p = ChickenWings.objects.all()[0]
         self.assertIn(ChickenWings.SUICIDE, p.flavour)
         self.assertIn(ChickenWings.BOURBON, p.flavour)
+
+    def test_creation_too_many_choices(self):
+        data = {
+            'flavour': [
+                ChickenWings.CAJUN, ChickenWings.BOURBON, ChickenWings.MILD]
+        }
+        response = self.client.post(
+            reverse('ftw:create'),
+            urlencode(MultiValueDict(data), doseq=True),
+            content_type='application/x-www-form-urlencoded')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('flavour', response.context['form'].errors)
+        self.assertEqual(len(response.context['form'].errors), 1)
 
 
 class ChickenWingsDetailViewTestCase(TestCase):
@@ -102,7 +112,6 @@ class ChickenWingsUpdateViewTestCase(TestCase):
             reverse('ftw:update', args=[self.chickenwings.id]),
             urlencode(MultiValueDict(data), doseq=True),
             content_type='application/x-www-form-urlencoded')
-        self.assertEqual(response.status_code, 302)
         self.assertRedirects(
             response,
             'http://testserver' + reverse('ftw:updated'))
@@ -121,7 +130,6 @@ class ChickenWingsDeleteViewTestCase(TestCase):
     def test_delete_chickenwings(self):
         response = self.client.post(
             reverse('ftw:delete', args=[self.chickenwings.id]))
-        self.assertEqual(response.status_code, 302)
         self.assertRedirects(
             response,
             'http://testserver' + reverse('ftw:deleted'))
