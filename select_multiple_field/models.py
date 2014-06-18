@@ -9,6 +9,7 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 
 from .codecs import decode_csv_to_list, encode_list_to_csv
+from .validators import MaxChoicesValidator, MaxLengthValidator
 import select_multiple_field.forms as forms
 
 
@@ -45,7 +46,10 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
             self.include_blank = kwargs.pop('include_blank')
 
         super(SelectMultipleField, self).__init__(*args, **kwargs)
-        self.validators.append(validators.MaxLengthValidator(self.max_length))
+
+        self.validators.append(MaxLengthValidator(self.max_length))
+        if hasattr(self, 'max_choices'):
+            self.validators.append(MaxChoicesValidator(self.max_choices))
 
     def __str__(self):
         return "%s" % force_text(self.description)
