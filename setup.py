@@ -35,7 +35,8 @@ class DemoTester(Command):
         from django import get_version
         django_release = re.search(r'^\d\.\d', get_version()).group(0)
         if ((django_release not in self.test_settings.keys())
-                or ([int(n) for n in re.split(r'[.ab]', get_version())] < [1, 4, 2])):
+                or ([int(n) for n in re.split(r'[.ab]', get_version())]
+                    < [1, 4, 2])):
             print("Please install Django 1.4.2 - 1.7 to run the test suite")
             exit(-1)
         os.environ['DJANGO_SETTINGS_MODULE'] = self.test_settings[
@@ -107,7 +108,7 @@ setup(
     author_email='code@kelvinwong.ca',
     url='https://github.com/kelvinwong-ca/django-select-multiple-field',
     classifiers=['Development Status :: 3 - Alpha',
-                 #'Development Status :: 4 - Beta',
+                 # 'Development Status :: 4 - Beta',
                  'Environment :: Web Environment',
                  'Framework :: Django',
                  'Intended Audience :: Developers',
