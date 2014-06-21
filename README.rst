@@ -2,12 +2,14 @@
 django-select-multiple-field
 ****************************
 
-Select multiple choices in a single Django model field.
+Select multiple choices in a single Django model field. Use whenever you want
+to store multiple choices in a field without using a many-to-many relation.
 
-.. warning::
+.. figure:: https://github.com/kelvinwong-ca/django-select-multiple-field/raw/master/docs/images/select_multiple_cropped.jpg
 
-    This Django module is not suitable for production use.
-    It has not been sufficiently tested.
+   Rendered using the multiselect.js plugin for jQuery [#]_
+
+.. [#] jquery.multi-select.js https://github.com/lou/multi-select
 
 Quick Start
 ===========

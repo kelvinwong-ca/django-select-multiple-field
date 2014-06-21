@@ -3,9 +3,10 @@ from django.views.generic import TemplateView
 
 from .views import (
     PizzaCreateView, PizzaDeleteView, PizzaDetailView, PizzaListView,
-    PizzaUpdateView)
+    PizzaUpdateView
+)
 
-urlpatterns = patterns('',
+urlpatterns = patterns('',  # NOQA
 
     url(r'^$', PizzaListView.as_view(), name='list'),
     url(r'^create/$', PizzaCreateView.as_view(), name='create'),

@@ -22,3 +22,6 @@ recursive-include test_projects/django14/global_assets/templates/theme *.html
 recursive-include test_projects/django14/pizzagigi *.py
 recursive-include test_projects/django14/pizzagigi/templates/pizzagigi *.html
 recursive-include test_projects/django14/pizzagigi/templatetags *.py
+recursive-include test_projects/django14/forthewing *.py
+recursive-include test_projects/django14/forthewing/templates/forthewing *.html
+recursive-include test_projects/django14/forthewing/templatetags *.py

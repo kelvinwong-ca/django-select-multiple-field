@@ -38,9 +38,26 @@ class PizzaCreateViewTestCase(TestCase):
         response = self.client.get(reverse('pizza:create'))
         self.assertEqual(response.status_code, 200)
 
-    def test_creation(self):
+    def test_creation_single(self):
         data = {
-            'toppings': [Pizza.MOZZARELLA, Pizza.PEPPERONI]
+            'toppings': [Pizza.BLACK_OLIVES]
+        }
+        response = self.client.post(
+            reverse('pizza:create'),
+            urlencode(MultiValueDict(data), doseq=True),
+            content_type='application/x-www-form-urlencoded'
+            )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(
+            response,
+            'http://testserver' + reverse('pizza:created'))
+        p = Pizza.objects.all()[0]
+        self.assertIn(Pizza.BLACK_OLIVES, p.toppings)
+
+    def test_creation_multiple(self):
+        data = {
+            'toppings': [Pizza.MOZZARELLA, Pizza.PANCETTA]
         }
         response = self.client.post(
             reverse('pizza:create'),
@@ -52,14 +69,14 @@ class PizzaCreateViewTestCase(TestCase):
             response,
             'http://testserver' + reverse('pizza:created'))
         p = Pizza.objects.all()[0]
-        self.assertTrue(Pizza.MOZZARELLA in p.toppings)
-        self.assertTrue(Pizza.PEPPERONI in p.toppings)
+        self.assertIn(Pizza.MOZZARELLA, p.toppings)
+        self.assertIn(Pizza.PANCETTA, p.toppings)
 
 
 class PizzaDetailViewTestCase(TestCase):
 
     def setUp(self):
-        self.pizza = Pizza(toppings=[Pizza.PEPPERONI])
+        self.pizza = Pizza(toppings=[Pizza.EGG])
         self.pizza.save()
 
     def test_view(self):
@@ -72,12 +89,12 @@ class PizzaDetailViewTestCase(TestCase):
 class PizzaUpdateViewTestCase(TestCase):
 
     def setUp(self):
-        self.pizza = Pizza(toppings=[Pizza.MOZZARELLA, Pizza.PEPPERONI])
+        self.pizza = Pizza(toppings=[Pizza.MUSHROOMS, Pizza.TOMATO])
         self.pizza.save()
 
     def test_change_toppings(self):
         data = {
-            'toppings': [Pizza.CHEDDAR_CHEESE, Pizza.MOZZARELLA]
+            'toppings': [Pizza.CHEDDAR_CHEESE, Pizza.MUSHROOMS]
         }
         response = self.client.post(
             reverse('pizza:update', args=[self.pizza.id]),
@@ -89,14 +106,14 @@ class PizzaUpdateViewTestCase(TestCase):
             'http://testserver' + reverse('pizza:updated'))
         p = Pizza.objects.all()[0]
         self.assertTrue(Pizza.CHEDDAR_CHEESE in p.toppings)
-        self.assertTrue(Pizza.MOZZARELLA in p.toppings)
-        self.assertFalse(Pizza.PEPPERONI in p.toppings)
+        self.assertTrue(Pizza.MUSHROOMS in p.toppings)
+        self.assertFalse(Pizza.TOMATO in p.toppings)
 
 
 class PizzaDeleteViewTestCase(TestCase):
 
     def setUp(self):
-        self.pizza = Pizza(toppings=[Pizza.PEPPERONI])
+        self.pizza = Pizza(toppings=[Pizza.PROSCIUTTO_CRUDO])
         self.pizza.save()
 
     def test_delete_pizza(self):
