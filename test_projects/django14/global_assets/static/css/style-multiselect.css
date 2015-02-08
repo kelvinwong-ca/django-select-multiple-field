@@ -1,0 +1,10 @@
+.ms-container {
+    width: 650px;
+    background-position: 58.5%;
+}
+.ms-container .ms-list {
+    margin-left: 0;
+}
+.ms-container .ms-selectable, .ms-container .ms-selection {
+    width: 35%;
+}
