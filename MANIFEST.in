@@ -1,6 +1,6 @@
 include LICENSE
 include README.rst
-include CONTRIBUTORS.txt
+include CONTRIBUTORS.rst
 
 
 recursive-include test_suite *.py
