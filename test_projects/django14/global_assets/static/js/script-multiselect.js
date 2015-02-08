@@ -1,5 +1,5 @@
 $(function(){
-	
-	$('#id_toppings').multiSelect();
+
+    $('#id_toppings').multiSelect();
 
 });
