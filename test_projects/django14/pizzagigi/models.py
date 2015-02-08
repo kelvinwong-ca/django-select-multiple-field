@@ -45,11 +45,8 @@ class Pizza(models.Model):
     def get_toppings(self):
         if self.toppings:
             keys_choices = self.toppings
-            return u'%s' % (', '.join(filter(bool, keys_choices)))
-    get_toppings.short_description = _(u'Toppings')
-
-    def __unicode__(self):
-        return u'Pizza'
+            return '%s' % (', '.join(filter(bool, keys_choices)))
+    get_toppings.short_description = _('Toppings')
 
     def __str__(self):
         return "pk=%s" % force_text(self.pk)
