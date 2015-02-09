@@ -233,3 +233,11 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
 
         defaults.update(kwargs)
         return forms.SelectMultipleFormField(**defaults)
+
+try:
+    from south.modelsinspector import add_introspection_rules
+except ImportError:
+    pass
+else:
+    add_introspection_rules(
+        [], ["^select_mulitple_field\.models\.SelectMultipleField"])
