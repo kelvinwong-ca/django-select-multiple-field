@@ -22,6 +22,7 @@ class DemoTester(Command):
         '1.5': 'test_projects.django14.django14.settings',
         '1.6': 'test_projects.django14.django14.settings',
         '1.7': 'test_projects.django14.django14.settings',
+        '1.8': 'test_projects.django14.django14.settings',
     }
 
     def initialize_options(self):
@@ -37,14 +38,14 @@ class DemoTester(Command):
         if ((django_release not in self.test_settings.keys())
                 or ([int(n) for n in re.split(r'[.ab]', get_version())]
                     < [1, 4, 2])):
-            print("Please install Django 1.4.2 - 1.7 to run the test suite")
+            print("Please install Django 1.4.19 - 1.8 to run the test suite")
             exit(-1)
         os.environ['DJANGO_SETTINGS_MODULE'] = self.test_settings[
             django_release]
         try:
             from django.core.management import call_command
         except ImportError:
-            print("Please install Django 1.4.2 - 1.7 to run the test suite")
+            print("Please install Django 1.4.19 - 1.8 to run the test suite")
             exit(-1)
 
         import django
@@ -78,7 +79,7 @@ class Tester(Command):
         try:
             from django.utils.unittest import TextTestRunner, defaultTestLoader
         except ImportError:
-            print("Please install Django => 1.4.2 to run the test suite")
+            print("Please install Django => 1.4.19 to run the test suite")
             exit(-1)
         from test_suite import (
             test_codecs, test_forms, test_models, test_validators,
