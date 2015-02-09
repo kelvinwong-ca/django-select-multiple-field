@@ -134,24 +134,24 @@ There is a sample application included if you downloaded the tarball. You can tr
     Validating models...
 
     0 errors found
-    Django version 1.4.2, using settings 'django14.settings'
+    Django version 1.4.19, using settings 'django14.settings'
     Development server is running at http://127.0.0.1:8000/
     Quit the server with CONTROL-C.
 
 Troubleshooting
 ===============
 
-Django-select-multiple-field contains two test suites. One is for the field and one is for an implementation of the field in a Django 1.4.2 project.
+Django-select-multiple-field contains two test suites. One is for the field and one is for an implementation of the field in a Django 1.4.19 project.
 
 You can run the field tests by downloading the tarball and running 'test' in setup.py::
 
     $ python setup.py test
 
-You can run the Django 1.4.2 demo test in a similar manner::
+You can run the Django 1.4.19 demo test in a similar manner::
 
     $ python setup.py test_demo
 
-Needless to say you will need to have Django 1.4.2 or later installed.
+Needless to say you will need to have Django 1.4.19 or later installed.
 
 Bugs! Help!!
 ============
