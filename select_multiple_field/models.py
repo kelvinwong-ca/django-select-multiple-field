@@ -234,6 +234,33 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
         defaults.update(kwargs)
         return forms.SelectMultipleFormField(**defaults)
 
+    def deconstruct(self):
+        """
+        How to reduce the field to a serializable form.
+
+        The arguments to pass to field constructor to reconstruct it.
+
+        Returns a tuple of four items:
+            the field’s attribute name,
+            the full import path of the field class,
+            the positional arguments (an empty list in this case),
+            the keyword arguments (as a dict).
+        """
+        name, path, args, kwargs = super(
+            SelectMultipleField, self).deconstruct()
+        if hasattr(self, 'max_choices'):
+            kwargs["max_choices"] = self.max_choices
+
+        if hasattr(self, 'include_blank'):
+            kwargs["include_blank"] = self.include_blank
+
+        return (
+            force_text(name, strings_only=True),
+            path,
+            args,
+            kwargs,
+        )
+
 try:
     from south.modelsinspector import add_introspection_rules
 except ImportError:
