@@ -37,21 +37,21 @@ class ChickenBalls(models.Model):
         max_choices=2,
         choices=FLAVOUR_CHOICES
     )
-    # RANCH = 'r'
-    # HONEY_MUSTARD = 'h'
-    # BBQ = 'b'
-    # DIP_CHOICES = (
-    #     (RANCH, _('Ranch')),
-    #     (HONEY_MUSTARD, _('Honey mustard')),
-    #     (BBQ, _('BBQ')),
-    # )
-    # dips = SelectMultipleField(
-    #     blank=True,
-    #     include_blank=False,
-    #     max_length=6,
-    #     max_choices=3,
-    #     choices=DIP_CHOICES
-    # )
+    RANCH = 'r'
+    HONEY_MUSTARD = 'h'
+    BBQ = 'b'
+    DIP_CHOICES = (
+        (RANCH, _('Ranch')),
+        (HONEY_MUSTARD, _('Honey mustard')),
+        (BBQ, _('BBQ')),
+    )
+    dips = SelectMultipleField(
+        blank=True,
+        include_blank=False,
+        max_length=6,
+        max_choices=3,
+        choices=DIP_CHOICES
+    )
 
     def __str__(self):
         return "pk=%s" % force_text(self.pk)
