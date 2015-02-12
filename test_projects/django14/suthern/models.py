@@ -47,6 +47,7 @@ class ChickenBalls(models.Model):
     )
     dips = SelectMultipleField(
         blank=True,
+        default='',
         include_blank=False,
         max_length=6,
         max_choices=3,
