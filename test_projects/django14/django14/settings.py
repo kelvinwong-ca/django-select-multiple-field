@@ -125,7 +125,7 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'global_assets', 'templates'),
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'select_multiple_field',
     'pizzagigi',
     'forthewing',
@@ -140,7 +140,19 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-)
+]
+
+SOUTH_APPS = [
+    'south',
+    'suthern',
+]
+
+try:
+    import south
+except ImportError:
+    pass
+else:
+    INSTALLED_APPS.extend(SOUTH_APPS)
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

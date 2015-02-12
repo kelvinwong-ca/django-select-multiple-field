@@ -234,6 +234,25 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
         defaults.update(kwargs)
         return forms.SelectMultipleFormField(**defaults)
 
+    def south_field_triple(self):
+        try:
+            from south.modelsinspector import introspector
+        except ImportError:
+            pass
+        else:
+            cls_name = '{}.{}'.format(
+                self.__class__.__module__,
+                self.__class__.__name__)
+            args, kwargs = introspector(self)
+
+            if hasattr(self, 'max_choices'):
+                kwargs["max_choices"] = self.max_choices
+
+            if hasattr(self, 'include_blank'):
+                kwargs["include_blank"] = self.include_blank
+
+            return (cls_name, args, kwargs)
+
     def deconstruct(self):
         """
         How to reduce the field to a serializable form.
@@ -248,6 +267,7 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
         """
         name, path, args, kwargs = super(
             SelectMultipleField, self).deconstruct()
+
         if hasattr(self, 'max_choices'):
             kwargs["max_choices"] = self.max_choices
 
@@ -260,11 +280,3 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
             args,
             kwargs,
         )
-
-try:
-    from south.modelsinspector import add_introspection_rules
-except ImportError:
-    pass
-else:
-    add_introspection_rules(
-        [], ["^select_mulitple_field\.models\.SelectMultipleField"])
