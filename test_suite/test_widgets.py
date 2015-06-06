@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.forms import widgets
 from django.test import SimpleTestCase
-from django.utils.datastructures import MergeDict, MultiValueDict
+from django.utils.datastructures import MultiValueDict
 
 from select_multiple_field.widgets import (
     HTML_ATTR_CLASS, SelectMultipleField)
@@ -73,9 +73,9 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         # MergeDict are generated from QueryDict which are subclasses of
         # MultiValueDict
         #
-        data_obj = MergeDict(MultiValueDict(data))
-        obj = w.value_from_datadict(data_obj, None, name)
-        self.assertIsInstance(obj, list)
-        self.assertIn(self.choices[0][0], obj)
-        self.assertNotIn(self.choices[1][0], obj)
-        self.assertIn(self.choices[2][0], obj)
+        # data_obj = MergeDict(MultiValueDict(data))
+        # obj = w.value_from_datadict(data_obj, None, name)
+        # self.assertIsInstance(obj, list)
+        # self.assertIn(self.choices[0][0], obj)
+        # self.assertNotIn(self.choices[1][0], obj)
+        # self.assertIn(self.choices[2][0], obj)
