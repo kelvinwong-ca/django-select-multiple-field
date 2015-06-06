@@ -23,6 +23,7 @@ class DemoTester(Command):
         '1.6': 'test_projects.django14.django14.settings',
         '1.7': 'test_projects.django14.django14.settings',
         '1.8': 'test_projects.django14.django14.settings',
+        '1.9': 'test_projects.django14.django14.settings',
     }
 
     def initialize_options(self):
@@ -87,8 +88,8 @@ class Tester(Command):
         try:
             from django.utils.unittest import TextTestRunner, defaultTestLoader
         except ImportError:
-            print("Please install Django => 1.4.19 to run the test suite")
-            exit(-1)
+            from unittest import TextTestRunner, defaultTestLoader
+
         from test_suite import (
             test_codecs, test_forms, test_models, test_validators,
             test_widgets)
