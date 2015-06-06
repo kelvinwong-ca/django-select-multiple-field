@@ -2,8 +2,12 @@
 from __future__ import unicode_literals
 
 from django.forms import widgets
-from django.forms.utils import flatatt
 from django.utils.safestring import mark_safe
+
+try:
+    from django.forms.utils import flatatt
+except ImportError:
+    from django.forms.util import flatatt
 
 try:
     from django.utils.html import format_html
