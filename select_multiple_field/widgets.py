@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.forms import widgets
-from django.forms.util import flatatt
+from django.forms.utils import flatatt
 from django.utils.safestring import mark_safe
 
 try:
