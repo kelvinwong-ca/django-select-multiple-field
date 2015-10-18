@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import json
+
+from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.test import SimpleTestCase, TestCase
 from django.utils.datastructures import MultiValueDict
@@ -133,3 +136,35 @@ class PizzaModelTestCase(SimpleTestCase):
         for k, v in Pizza.TOPPING_CHOICES:
             topping_name = show_topping(k)
             self.assertEqual(topping_name, v)
+
+
+class PizzaCozyTestCase(TestCase):
+    """Serialzer tests for dumpdata operations"""
+
+    def setUp(self):
+        self.toppings_1 = [
+            Pizza.ANCHOVIES,
+            Pizza.BLACK_OLIVES,
+            Pizza.CHEDDAR_CHEESE,
+        ]
+        self.pizza_1 = Pizza.objects.create(toppings=self.toppings_1)
+        self.toppings_2 = [
+            Pizza.TOMATO,
+            Pizza.MOZZARELLA,
+        ]
+        self.pizza_2 = Pizza.objects.create(toppings=self.toppings_2)
+
+    def test_dumpdata_dumps_json(self):
+        """JSON can handle a native list type not only strings"""
+        q = Pizza.objects.all()
+        output = serializers.serialize('json', q)
+
+        js = json.loads(output)
+
+        self.assertTrue(isinstance(js, list))
+        ingredients = []
+        for i, __ in enumerate(js):
+            ingredients.extend(js[i]['fields']['toppings'])
+
+        for topping in list(self.toppings_1 + self.toppings_2):
+            self.assertIn(topping, ingredients)

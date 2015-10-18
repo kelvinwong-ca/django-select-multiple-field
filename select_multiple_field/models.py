@@ -121,6 +121,14 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
         field_options.update(kwargs)
         return super(SelectMultipleField, self).get_choices(**field_options)
 
+    def value_to_string(self, obj):
+        """
+        Used for serialization of the expected Python list
+        """
+        native = self._get_val_from_obj(obj)
+        return native
+        # return smart_text(self._get_val_from_obj(obj))  # Default code
+
     def validate(self, value, model_instance):
         """
         Validates value and throws ValidationError. Subclasses should override
