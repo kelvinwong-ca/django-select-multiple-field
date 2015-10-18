@@ -19,6 +19,10 @@ Quick Start
     Field attribute ``max_length`` must be set to a value longer than your
     longest expected encoded string
 
+.. important::
+
+    Choices must be strings, not integers.
+
 In your models add the select field choices normally::
 
     # models.py
