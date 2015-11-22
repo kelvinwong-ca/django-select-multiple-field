@@ -121,6 +121,16 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
         field_options.update(kwargs)
         return super(SelectMultipleField, self).get_choices(**field_options)
 
+    def has_choices(self):
+        """
+        Check if the field has choices values bound to it
+        """
+        choices = getattr(self, 'choices', None)
+        if choices is None:
+            choices = getattr(self, '_choices', None)
+
+        return bool(choices)
+
     def value_to_string(self, obj):
         """
         Used for serialization of the expected Python list
@@ -138,7 +148,7 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
             # Skip validation for non-editable fields.
             return
 
-        if self._choices and value:
+        if self.has_choices() and value:
             if isinstance(value, (list, tuple)):
                 bad_values = []
                 for opt in value:
