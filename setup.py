@@ -38,7 +38,7 @@ class DemoTester(Command):
         django_release = re.search(r'^\d\.\d', get_version()).group(0)
         test_settings_exist = django_release in self.test_settings.keys()
         try:
-            dj_ver =  [int(n) for n in re.split(r'[.ab]', get_version())]
+            dj_ver = [int(n) for n in re.split(r'[.ab]', get_version())]
         except ValueError:
             # Pre-release Djangos must be testable!!!
             dj_too_old = False
