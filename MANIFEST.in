@@ -27,3 +27,22 @@ recursive-include test_projects/django14/pizzagigi/templates/pizzagigi *.html
 recursive-include test_projects/django14/pizzagigi/templatetags *.py
 recursive-include test_projects/django14/suthern/ *.py
 recursive-include test_projects/django14/suthern/migrations/ *.py
+
+
+recursive-include test_projects/django18 *.py
+recursive-include test_projects/django18/django18 *.py
+recursive-include test_projects/django18/forthewing *.py
+recursive-include test_projects/django18/forthewing/templates/forthewing *.html
+recursive-include test_projects/django18/forthewing/templatetags *.py
+recursive-include test_projects/django18/global_assets/static/css *.css
+recursive-include test_projects/django18/global_assets/static/multiselect-0.9.10 *.txt *.markdown *.json
+recursive-include test_projects/django18/global_assets/static/multiselect-0.9.10/css *.css
+recursive-include test_projects/django18/global_assets/static/multiselect-0.9.10/img *.png
+recursive-include test_projects/django18/global_assets/static/multiselect-0.9.10/js *.js
+recursive-include test_projects/django18/global_assets/templates *.html
+recursive-include test_projects/django18/global_assets/templates/app *.html
+recursive-include test_projects/django18/global_assets/templates/theme *.html
+recursive-include test_projects/django18/pizzagigi *.py
+recursive-include test_projects/django18/pizzagigi/templates/pizzagigi *.html
+recursive-include test_projects/django18/pizzagigi/templatetags *.py
+
