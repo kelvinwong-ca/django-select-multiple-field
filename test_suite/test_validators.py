@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import string
 
+from django.core import validators
 from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase
 
@@ -22,7 +23,7 @@ class SelectMultipleFieldValidatorsTestCase(SimpleTestCase):
         item = SelectMultipleField(
             choices=self.choices, max_length=254, max_choices=1)
         self.assertEqual(item.max_choices, 1)
-        self.assertIsInstance(item.validators[1], MaxChoicesValidator)
+        self.assertIsInstance(item.validators[2], MaxChoicesValidator)
         self.assertIs(item.run_validators(self.choices_list[0:1]), None)
 
     def test_max_choices_many(self):
@@ -34,14 +35,14 @@ class SelectMultipleFieldValidatorsTestCase(SimpleTestCase):
                 max_length=254,
                 max_choices=many_choices_len)
             self.assertEqual(item.max_choices, many_choices_len)
-            self.assertIsInstance(item.validators[1], MaxChoicesValidator)
+            self.assertIsInstance(item.validators[2], MaxChoicesValidator)
             self.assertIs(item.run_validators(many_choices), None)
 
     def test_max_choices_validationerror_single(self):
         item = SelectMultipleField(
             choices=self.choices, max_length=10, max_choices=1)
         self.assertEqual(item.max_choices, 1)
-        self.assertIsInstance(item.validators[1], MaxChoicesValidator)
+        self.assertIsInstance(item.validators[2], MaxChoicesValidator)
         two_choices = self.choices_list[0:2]
         with self.assertRaises(ValidationError) as cm:
             item.run_validators(value=two_choices)
@@ -62,7 +63,7 @@ class SelectMultipleFieldValidatorsTestCase(SimpleTestCase):
                 max_length=254,
                 max_choices=test_max_choices)
             self.assertEqual(item.max_choices, test_max_choices)
-            self.assertIsInstance(item.validators[1], MaxChoicesValidator)
+            self.assertIsInstance(item.validators[2], MaxChoicesValidator)
             many_choices = self.choices_list[0:n]
             many_choices_len = len(many_choices)
             self.assertTrue(many_choices_len > test_max_choices)
@@ -79,7 +80,8 @@ class SelectMultipleFieldValidatorsTestCase(SimpleTestCase):
     def test_max_length_single(self):
         item = SelectMultipleField(choices=self.choices, max_length=1)
         self.assertEqual(item.max_length, 1)
-        self.assertIsInstance(item.validators[0], MaxLengthValidator)
+        self.assertIsInstance(item.validators[0], validators.MaxLengthValidator)
+        self.assertIsInstance(item.validators[1], MaxLengthValidator)
         choice = self.choices_list[0:1]
         self.assertIs(item.run_validators(value=choice), None)
 
@@ -90,20 +92,22 @@ class SelectMultipleFieldValidatorsTestCase(SimpleTestCase):
             item = SelectMultipleField(
                 choices=self.choices, max_length=encoded_choices_len)
             self.assertEqual(item.max_length, encoded_choices_len)
-            self.assertIsInstance(item.validators[0], MaxLengthValidator)
+            self.assertIsInstance(item.validators[0], validators.MaxLengthValidator)
+            self.assertIsInstance(item.validators[1], MaxLengthValidator)
             self.assertIs(item.run_validators(value=many_choices), None)
 
     def test_max_length_validationerror_single(self):
         item = SelectMultipleField(choices=self.choices, max_length=1)
         self.assertEqual(item.max_length, 1)
-        self.assertIsInstance(item.validators[0], MaxLengthValidator)
+        self.assertIsInstance(item.validators[0], validators.MaxLengthValidator)
+        self.assertIsInstance(item.validators[1], MaxLengthValidator)
         two_choices = self.choices_list[0:2]
         with self.assertRaises(ValidationError) as cm:
             item.run_validators(value=two_choices)
 
         self.assertEqual(
             cm.exception.messages[0],
-            MaxLengthValidator.message % {'limit_value': 1, 'show_value': 3}
+            MaxLengthValidator.message % {'limit_value': 1, 'show_value': 2}
         )
 
     def test_max_length_validationerror_many(self):
@@ -112,7 +116,8 @@ class SelectMultipleFieldValidatorsTestCase(SimpleTestCase):
             item = SelectMultipleField(
                 choices=self.choices, max_length=test_max_length)
             self.assertEqual(item.max_length, test_max_length)
-            self.assertIsInstance(item.validators[0], MaxLengthValidator)
+            self.assertIsInstance(item.validators[0], validators.MaxLengthValidator)
+            self.assertIsInstance(item.validators[1], MaxLengthValidator)
             many_choices = self.choices_list[0:n]
             many_choices_len = len(encode_list_to_csv(many_choices))
             self.assertTrue(many_choices_len > test_max_length)
