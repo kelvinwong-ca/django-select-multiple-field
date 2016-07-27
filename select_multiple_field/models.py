@@ -17,8 +17,7 @@ DEFAULT_DELIMITER = ','
 
 
 @python_2_unicode_compatible
-class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
-                                             models.Field)):
+class SelectMultipleField(models.CharField):
     """Stores multiple selection choices as serialized list"""
 
     default_error_messages = {
