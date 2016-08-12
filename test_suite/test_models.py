@@ -84,6 +84,26 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         self.assertIsInstance(
             item.get_prep_value(self.choices_list), six.string_types)
 
+    def test_from_db_value_none(self):
+        item = SelectMultipleField()
+        self.assertIs(item.from_db_value(None, None, None, None), None)
+
+    def test_from_db_value_empty_string(self):
+        item = SelectMultipleField()
+        self.assertIsInstance(item.from_db_value('', None, None, None), list)
+        self.assertEquals(item.from_db_value([], None, None, None), [])
+
+    def test_from_db_value_list(self):
+        item = SelectMultipleField()
+        self.assertIsInstance(
+            item.from_db_value('A,B', None, None, None),
+            list,
+        )
+        self.assertEquals(
+            item.from_db_value('A,B', None, None, None),
+            ['A', 'B'],
+        )
+
     def test_to_python_none(self):
         item = SelectMultipleField()
         self.assertIs(item.to_python(None), None)
