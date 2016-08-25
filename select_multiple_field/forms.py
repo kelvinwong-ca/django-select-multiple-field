@@ -59,9 +59,9 @@ class SelectMultipleFormField(fields.MultipleChoiceField):
         if (value == self.empty_value) or (value in self.empty_values):
             try:
                 # must be iterable
-                it = iter(self.empty_value)
+                iter(self.empty_value)
                 return self.empty_value
-            except TypeError, te:
+            except TypeError:
                 return []
 
         if isinstance(value, six.string_types):
