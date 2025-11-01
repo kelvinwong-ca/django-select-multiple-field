@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import django
 from django.core import exceptions, validators
 from django.db import models
 from django.utils import six
@@ -16,9 +17,14 @@ import select_multiple_field.forms as forms
 DEFAULT_DELIMITER = ','
 
 
+if django.VERSION < (1, 8):
+    base_class = six.with_metaclass(models.SubfieldBase, models.Field)
+else:
+    base_class = models.CharField
+
+
 @python_2_unicode_compatible
-class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
-                                             models.Field)):
+class SelectMultipleField(base_class):
     """Stores multiple selection choices as serialized list"""
 
     default_error_messages = {
@@ -46,6 +52,12 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
             self.include_blank = kwargs.pop('include_blank')
 
         super(SelectMultipleField, self).__init__(*args, **kwargs)
+
+        # remove CharField's MaxLengthValidator
+        if self.validators and isinstance(
+            self.validators[-1], validators.MaxLengthValidator
+        ):
+            self.validators = self.validators[:-1]
 
         self.validators.append(MaxLengthValidator(self.max_length))
         if hasattr(self, 'max_choices'):
@@ -85,6 +97,18 @@ class SelectMultipleField(six.with_metaclass(models.SubfieldBase,
 
         msg = self.error_messages['invalid_type'] % {'value': type(value)}
         raise exceptions.ValidationError(msg)
+
+    def from_db_value(self, value, expression, connection, context):
+        """
+        Converts a value as returned by the database to a Python object.
+        It is the reverse of get_prep_value().
+        """
+        if value is None:
+            return None
+
+        if isinstance(value, six.string_types):
+            return decode_csv_to_list(value)
+        return value
 
     def get_prep_value(self, value):
         """

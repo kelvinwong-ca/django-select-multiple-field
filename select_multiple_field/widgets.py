@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import django
 from django.forms import widgets
 from django.utils.safestring import mark_safe
 
@@ -24,9 +25,10 @@ class SelectMultipleField(widgets.SelectMultiple):
 
     allow_multiple_selected = True
 
-    def render(self, name, value, attrs={}, choices=()):
+    def render(self, name, value, attrs=None, choices=()):
         rendered_attrs = {'class': HTML_ATTR_CLASS}
-        rendered_attrs.update(attrs)
+        if attrs:
+            rendered_attrs.update(attrs)
         if value is None:
             value = []
 
@@ -34,7 +36,10 @@ class SelectMultipleField(widgets.SelectMultiple):
         # output = [u'<select multiple="multiple"%s>' % flatatt(final_attrs)]
         output = [format_html('<select multiple="multiple"{0}>',
                               flatatt(final_attrs))]
-        options = self.render_options(choices, value)
+        if django.VERSION >= (1, 10):
+            options = self.render_options(value)
+        else:
+            options = self.render_options(choices, value)
         if options:
             output.append(options)
 
