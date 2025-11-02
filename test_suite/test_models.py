@@ -59,7 +59,7 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
     def test_get_internal_type(self):
         item = SelectMultipleField()
         charfield = CharField()
-        self.assertEquals(item.get_internal_type(), charfield.get_internal_type())
+        self.assertEqual(item.get_internal_type(), charfield.get_internal_type())
 
     def test_get_prep_value_none(self):
         """None stored as NULL in db"""
@@ -70,7 +70,7 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         """No choice stored as empty string"""
         item = SelectMultipleField()
         self.assertIsInstance(item.get_prep_value([]), str)
-        self.assertEquals(item.get_prep_value([]), "")
+        self.assertEqual(item.get_prep_value([]), "")
 
     def test_get_prep_value_list(self):
         item = SelectMultipleField()
@@ -83,7 +83,7 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
     def test_from_db_value_empty_string(self):
         item = SelectMultipleField()
         self.assertIsInstance(item.from_db_value("", None, None, None), list)
-        self.assertEquals(item.from_db_value([], None, None, None), [])
+        self.assertEqual(item.from_db_value([], None, None, None), [])
 
     def test_from_db_value_list(self):
         item = SelectMultipleField()
@@ -91,7 +91,7 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
             item.from_db_value("A,B", None, None, None),
             list,
         )
-        self.assertEquals(
+        self.assertEqual(
             item.from_db_value("A,B", None, None, None),
             ["A", "B"],
         )
@@ -103,14 +103,14 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
     def test_to_python_empty_list(self):
         item = SelectMultipleField()
         self.assertIsInstance(item.to_python([]), list)
-        self.assertEquals(item.to_python([]), [])
+        self.assertEqual(item.to_python([]), [])
 
     def test_to_python_list(self):
         for choices, choices_list in self.test_choices:
             item = SelectMultipleField(choices=choices)
             self.assertTrue(item.choices)
             self.assertIsInstance(item.to_python(choices_list), list)
-            self.assertEquals(item.to_python(choices_list), choices_list)
+            self.assertEqual(item.to_python(choices_list), choices_list)
 
     def test_to_python_list_w_invalid_value(self):
         item = SelectMultipleField(choices=self.choices)
@@ -130,13 +130,13 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
     def test_to_python_empty_string(self):
         item = SelectMultipleField()
         self.assertIsInstance(item.to_python(""), list)
-        self.assertEquals(item.to_python(""), [])
+        self.assertEqual(item.to_python(""), [])
 
     def test_to_python_single_string(self):
         item = SelectMultipleField()
         single = self.choices_list[3]
         self.assertIsInstance(item.to_python(single), list)
-        self.assertEquals(item.to_python(single), [single])
+        self.assertEqual(item.to_python(single), [single])
 
     def test_to_python_string(self):
         item = SelectMultipleField()
