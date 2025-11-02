@@ -1,43 +1,33 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import django
 from django.core import exceptions, validators
 from django.db import models
-from django.utils import six
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_str
 from django.utils.text import capfirst
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .codecs import decode_csv_to_list, encode_list_to_csv
 from .validators import MaxChoicesValidator, MaxLengthValidator
 import select_multiple_field.forms as forms
 
 
-DEFAULT_DELIMITER = ','
+DEFAULT_DELIMITER = ","
 
 
-if django.VERSION < (1, 8):
-    base_class = six.with_metaclass(models.SubfieldBase, models.Field)
-else:
-    base_class = models.CharField
-
-
-@python_2_unicode_compatible
-class SelectMultipleField(base_class):
+class SelectMultipleField(models.CharField):
     """Stores multiple selection choices as serialized list"""
 
     default_error_messages = {
-        'blank': _("This field cannot be blank."),
-        'invalid_type': _(
+        "blank": _("This field cannot be blank."),
+        "invalid_type": _(
             "Types passed as value must be string, list, tuple or None, "
-            "not '%(value)s'."),
-        'invalid_choice': _(
-            "Select a valid choice. %(value)s is not one of the available "
-            "choices."),
-        'null': _("This field cannot be null."),
+            "not '%(value)s'."
+        ),
+        "invalid_choice": _(
+            "Select a valid choice. %(value)s is not one of the available " "choices."
+        ),
+        "null": _("This field cannot be null."),
     }
-    description = _('Select multiple field')
+    description = _("Select multiple field")
 
     def __init__(self, *args, **kwargs):
         """
@@ -45,11 +35,11 @@ class SelectMultipleField(base_class):
 
         By default responses are required, so 'blank' is False
         """
-        if 'max_choices' in kwargs:
-            self.max_choices = kwargs.pop('max_choices')
+        if "max_choices" in kwargs:
+            self.max_choices = kwargs.pop("max_choices")
 
-        if 'include_blank' in kwargs:
-            self.include_blank = kwargs.pop('include_blank')
+        if "include_blank" in kwargs:
+            self.include_blank = kwargs.pop("include_blank")
 
         super(SelectMultipleField, self).__init__(*args, **kwargs)
 
@@ -60,11 +50,11 @@ class SelectMultipleField(base_class):
             self.validators = self.validators[:-1]
 
         self.validators.append(MaxLengthValidator(self.max_length))
-        if hasattr(self, 'max_choices'):
+        if hasattr(self, "max_choices"):
             self.validators.append(MaxChoicesValidator(self.max_choices))
 
     def __str__(self):
-        return "%s" % force_text(self.description)
+        return "%s" % force_str(self.description)
 
     def get_internal_type(self):
         return "CharField"
@@ -88,14 +78,14 @@ class SelectMultipleField(base_class):
             self.validate_options_list(value)
             return value
 
-        elif isinstance(value, six.string_types):
+        elif isinstance(value, str):
             #
             # Strings are always encoded choices
             #
             native = decode_csv_to_list(value)
             return native
 
-        msg = self.error_messages['invalid_type'] % {'value': type(value)}
+        msg = self.error_messages["invalid_type"] % {"value": type(value)}
         raise exceptions.ValidationError(msg)
 
     def from_db_value(self, value, expression, connection, context):
@@ -106,7 +96,7 @@ class SelectMultipleField(base_class):
         if value is None:
             return None
 
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             return decode_csv_to_list(value)
         return value
 
@@ -134,14 +124,12 @@ class SelectMultipleField(base_class):
         kwargs
         """
         include_blank = False
-        if hasattr(self, 'include_blank'):
+        if hasattr(self, "include_blank"):
             include_blank = self.include_blank
-            if 'include_blank' in kwargs:
-                kwargs.pop('include_blank')
+            if "include_blank" in kwargs:
+                kwargs.pop("include_blank")
 
-        field_options = {
-            'include_blank': include_blank
-        }
+        field_options = {"include_blank": include_blank}
         field_options.update(kwargs)
         return super(SelectMultipleField, self).get_choices(**field_options)
 
@@ -149,9 +137,9 @@ class SelectMultipleField(base_class):
         """
         Check if the field has choices values bound to it
         """
-        choices = getattr(self, 'choices', None)
+        choices = getattr(self, "choices", None)
         if choices is None:
-            choices = getattr(self, '_choices', None)
+            choices = getattr(self, "_choices", None)
 
         return bool(choices)
 
@@ -183,18 +171,17 @@ class SelectMultipleField(base_class):
                 if len(bad_values) == 0:
                     return
                 else:
-                    msg = self.error_messages['invalid_choice'] % {
-                        'value': bad_values}
+                    msg = self.error_messages["invalid_choice"] % {"value": bad_values}
                     raise exceptions.ValidationError(msg)
 
-            msg = self.error_messages['invalid_choice'] % {'value': value}
+            msg = self.error_messages["invalid_choice"] % {"value": value}
             raise exceptions.ValidationError(msg)
 
         if value is None and not self.null:
-            raise exceptions.ValidationError(self.error_messages['null'])
+            raise exceptions.ValidationError(self.error_messages["null"])
 
         if not self.blank and value in validators.EMPTY_VALUES:
-            raise exceptions.ValidationError(self.error_messages['blank'])
+            raise exceptions.ValidationError(self.error_messages["blank"])
 
     def validate_options_list(self, value):
         """
@@ -206,7 +193,7 @@ class SelectMultipleField(base_class):
         """
         for option in value:
             if not self.validate_option(option):
-                msg = self.error_messages['invalid_choice'] % {'value': option}
+                msg = self.error_messages["invalid_choice"] % {"value": option}
                 raise exceptions.ValidationError(msg)
 
         return
@@ -244,33 +231,44 @@ class SelectMultipleField(base_class):
 
         Returns select_multiple_field.forms.SelectMultipleFormField
         """
-        defaults = {'required': not self.blank,
-                    'label': capfirst(self.verbose_name),
-                    'help_text': self.help_text}
+        defaults = {
+            "required": not self.blank,
+            "label": capfirst(self.verbose_name),
+            "help_text": self.help_text,
+        }
         if self.has_default():
             if callable(self.default):
-                defaults['initial'] = self.default
-                defaults['show_hidden_initial'] = True
+                defaults["initial"] = self.default
+                defaults["show_hidden_initial"] = True
             else:
-                defaults['initial'] = self.get_default()
+                defaults["initial"] = self.get_default()
 
         if self.choices:
             # Django normally includes an empty choice if blank, has_default
             # and initial are all False, we are intentially breaking this
             # convention
             include_blank = self.blank
-            defaults['choices'] = self.get_choices(include_blank=include_blank)
-            defaults['coerce'] = self.to_python
+            defaults["choices"] = self.get_choices(include_blank=include_blank)
+            defaults["coerce"] = self.to_python
             if self.null:
-                defaults['empty_value'] = None
+                defaults["empty_value"] = None
 
             # Many of the subclass-specific formfield arguments (min_value,
             # max_value) don't apply for choice fields, so be sure to only pass
             # the values that SelectMultipleFormField will understand.
             for k in kwargs.keys():
-                if k not in ('coerce', 'empty_value', 'choices', 'required',
-                             'widget', 'label', 'initial', 'help_text',
-                             'error_messages', 'show_hidden_initial'):
+                if k not in (
+                    "coerce",
+                    "empty_value",
+                    "choices",
+                    "required",
+                    "widget",
+                    "label",
+                    "initial",
+                    "help_text",
+                    "error_messages",
+                    "show_hidden_initial",
+                ):
                     del kwargs[k]
 
         defaults.update(kwargs)
@@ -282,15 +280,15 @@ class SelectMultipleField(base_class):
         except ImportError:
             pass
         else:
-            cls_name = '{}.{}'.format(
-                self.__class__.__module__,
-                self.__class__.__name__)
+            cls_name = "{}.{}".format(
+                self.__class__.__module__, self.__class__.__name__
+            )
             args, kwargs = introspector(self)
 
-            if hasattr(self, 'max_choices'):
+            if hasattr(self, "max_choices"):
                 kwargs["max_choices"] = self.max_choices
 
-            if hasattr(self, 'include_blank'):
+            if hasattr(self, "include_blank"):
                 kwargs["include_blank"] = self.include_blank
 
             return (cls_name, args, kwargs)
@@ -307,17 +305,16 @@ class SelectMultipleField(base_class):
             the positional arguments (an empty list in this case),
             the keyword arguments (as a dict).
         """
-        name, path, args, kwargs = super(
-            SelectMultipleField, self).deconstruct()
+        name, path, args, kwargs = super(SelectMultipleField, self).deconstruct()
 
-        if hasattr(self, 'max_choices'):
+        if hasattr(self, "max_choices"):
             kwargs["max_choices"] = self.max_choices
 
-        if hasattr(self, 'include_blank'):
+        if hasattr(self, "include_blank"):
             kwargs["include_blank"] = self.include_blank
 
         return (
-            force_text(name, strings_only=True),
+            force_str(name, strings_only=True),
             path,
             args,
             kwargs,

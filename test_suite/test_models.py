@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import collections
 import string
 
@@ -8,7 +5,6 @@ from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db.models.fields import BLANK_CHOICE_DASH, CharField, Field
 from django.test import SimpleTestCase
-from django.utils import six
 
 from select_multiple_field.codecs import encode_list_to_csv
 from select_multiple_field.forms import SelectMultipleFormField
@@ -23,7 +19,7 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
 
     def setUp(self):
         self.choices = tuple([(c, c) for c in string.ascii_letters])
-        self.choices_list = [c[0] for c in self.choices[0:len(self.choices)]]
+        self.choices_list = [c[0] for c in self.choices[0 : len(self.choices)]]
         #
         # Make some optgroup choices
         #
@@ -42,7 +38,7 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         self.optgroup_choices_list.sort()
         self.test_choices = [
             (self.choices, self.choices_list),
-            (self.optgroup_choices, self.optgroup_choices_list)
+            (self.optgroup_choices, self.optgroup_choices_list),
         ]
 
     def test_instantiation(self):
@@ -63,8 +59,7 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
     def test_get_internal_type(self):
         item = SelectMultipleField()
         charfield = CharField()
-        self.assertEquals(item.get_internal_type(),
-                          charfield.get_internal_type())
+        self.assertEquals(item.get_internal_type(), charfield.get_internal_type())
 
     def test_get_prep_value_none(self):
         """None stored as NULL in db"""
@@ -74,15 +69,12 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
     def test_get_prep_value_empty_list(self):
         """No choice stored as empty string"""
         item = SelectMultipleField()
-        self.assertIsInstance(
-            item.get_prep_value([]), six.string_types)
-        self.assertEquals(
-            item.get_prep_value([]), '')
+        self.assertIsInstance(item.get_prep_value([]), str)
+        self.assertEquals(item.get_prep_value([]), "")
 
     def test_get_prep_value_list(self):
         item = SelectMultipleField()
-        self.assertIsInstance(
-            item.get_prep_value(self.choices_list), six.string_types)
+        self.assertIsInstance(item.get_prep_value(self.choices_list), str)
 
     def test_from_db_value_none(self):
         item = SelectMultipleField()
@@ -90,18 +82,18 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
 
     def test_from_db_value_empty_string(self):
         item = SelectMultipleField()
-        self.assertIsInstance(item.from_db_value('', None, None, None), list)
+        self.assertIsInstance(item.from_db_value("", None, None, None), list)
         self.assertEquals(item.from_db_value([], None, None, None), [])
 
     def test_from_db_value_list(self):
         item = SelectMultipleField()
         self.assertIsInstance(
-            item.from_db_value('A,B', None, None, None),
+            item.from_db_value("A,B", None, None, None),
             list,
         )
         self.assertEquals(
-            item.from_db_value('A,B', None, None, None),
-            ['A', 'B'],
+            item.from_db_value("A,B", None, None, None),
+            ["A", "B"],
         )
 
     def test_to_python_none(self):
@@ -123,35 +115,33 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
     def test_to_python_list_w_invalid_value(self):
         item = SelectMultipleField(choices=self.choices)
         self.assertTrue(item.choices)
-        invalid_list = ['InvalidChoice']
+        invalid_list = ["InvalidChoice"]
         with self.assertRaises(ValidationError) as cm:
             item.to_python(invalid_list)
 
         self.assertEqual(
             cm.exception.messages[0],
-            (SelectMultipleField.default_error_messages['invalid_choice']
-                % {'value': invalid_list[0]})
+            (
+                SelectMultipleField.default_error_messages["invalid_choice"]
+                % {"value": invalid_list[0]}
+            ),
         )
 
     def test_to_python_empty_string(self):
         item = SelectMultipleField()
-        self.assertIsInstance(
-            item.to_python(''), list)
-        self.assertEquals(
-            item.to_python(''), [])
+        self.assertIsInstance(item.to_python(""), list)
+        self.assertEquals(item.to_python(""), [])
 
     def test_to_python_single_string(self):
         item = SelectMultipleField()
         single = self.choices_list[3]
-        self.assertIsInstance(
-            item.to_python(single), list)
-        self.assertEquals(
-            item.to_python(single), [single])
+        self.assertIsInstance(item.to_python(single), list)
+        self.assertEquals(item.to_python(single), [single])
 
     def test_to_python_string(self):
         item = SelectMultipleField()
         for i, v in enumerate(self.choices_list):
-            subset = self.choices_list[0: i]
+            subset = self.choices_list[0:i]
             encoded = encode_list_to_csv(subset)
             self.assertIsInstance(item.to_python(encoded), list)
             self.assertEqual(item.to_python(encoded), sorted(subset))
@@ -164,8 +154,11 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
 
         self.assertEqual(
             cm.exception.messages[0],
-            (SelectMultipleField.default_error_messages['invalid_type']
-                % {'value': type(invalid_type)}))
+            (
+                SelectMultipleField.default_error_messages["invalid_type"]
+                % {"value": type(invalid_type)}
+            ),
+        )
 
     def test_get_choices(self):
         """Overridden get_choices suppresses blank choice tuple"""
@@ -216,7 +209,7 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
             item.editable = True
             instance = "Fake Unused Instance"
             for i, v in enumerate(choices[1]):
-                subset = self.choices_list[0: i + 1]
+                subset = self.choices_list[0 : i + 1]
                 self.assertIs(item.validate(subset, instance), None)
 
     def test_validate_not_editable(self):
@@ -236,8 +229,10 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
 
         self.assertEqual(
             cm.exception.messages[0],
-            (SelectMultipleField.default_error_messages['invalid_choice']
-                % {'value': value})
+            (
+                SelectMultipleField.default_error_messages["invalid_choice"]
+                % {"value": value}
+            ),
         )
 
     def test_validate_invalid_string(self):
@@ -250,8 +245,10 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
 
         self.assertEqual(
             cm.exception.messages[0],
-            (SelectMultipleField.default_error_messages['invalid_choice']
-                % {'value': value})
+            (
+                SelectMultipleField.default_error_messages["invalid_choice"]
+                % {"value": value}
+            ),
         )
 
     def test_validate_not_null(self):
@@ -264,15 +261,14 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
             self.assertTrue(item.validate(value, instance))
 
         self.assertEqual(
-            cm.exception.messages[0],
-            SelectMultipleField.default_error_messages['null']
+            cm.exception.messages[0], SelectMultipleField.default_error_messages["null"]
         )
 
     def test_validate_blank(self):
         item = SelectMultipleField(choices=self.choices)
         item.editable = True
         item.blank = True
-        value = ['']
+        value = [""]
         instance = "Fake Unused Instance"
         self.assertIs(item.validate(value, instance), None)
 
@@ -287,7 +283,7 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
 
         self.assertEqual(
             cm.exception.messages[0],
-            SelectMultipleField.default_error_messages['blank']
+            SelectMultipleField.default_error_messages["blank"],
         )
 
     def test_validate_options_list(self):
@@ -297,14 +293,16 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
 
     def test_validate_options_list_raises_validationerror(self):
         item = SelectMultipleField(choices=self.choices)
-        value = ['InvalidChoice']
+        value = ["InvalidChoice"]
         with self.assertRaises(ValidationError) as cm:
             self.assertTrue(item.validate_options_list(value))
 
         self.assertEqual(
             cm.exception.messages[0],
-            (SelectMultipleField.default_error_messages['invalid_choice']
-                % {'value': value[0]})
+            (
+                SelectMultipleField.default_error_messages["invalid_choice"]
+                % {"value": value[0]}
+            ),
         )
 
     def test_validate_option_choice_true(self):

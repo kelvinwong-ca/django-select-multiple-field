@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import django
 from django.forms import widgets
 from django.utils.safestring import mark_safe

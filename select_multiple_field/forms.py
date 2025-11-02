@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.conf import settings
 from django.core import validators
 from django.forms import fields
-from django.utils import six
 
 from .codecs import decode_csv_to_list
 from .widgets import SelectMultipleField
@@ -59,7 +55,7 @@ class SelectMultipleFormField(fields.MultipleChoiceField):
         if (value == self.empty_value) or (value in self.empty_values):
             return self.empty_value
 
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             if len(value) == 0:
                 return []
 
