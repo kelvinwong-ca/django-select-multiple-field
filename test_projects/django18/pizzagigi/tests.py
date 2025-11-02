@@ -130,12 +130,17 @@ class PizzaDeleteViewTestCase(TestCase):
         self.assertEqual(len(pl), 0)
 
 
-class PizzaModelTestCase(SimpleTestCase):
+class PizzaModelTestCase(TestCase):
 
     def test_show_topping(self):
         for k, v in Pizza.TOPPING_CHOICES:
             topping_name = show_topping(k)
             self.assertEqual(topping_name, v)
+
+    def test_value_converted_to_list_from_db(self):
+        pizza = Pizza.objects.create(toppings=[Pizza.PEPPERONI])
+        pizza_from_db = Pizza.objects.get(pk=pizza.pk)
+        self.assertEqual(pizza_from_db.toppings, [Pizza.PEPPERONI])
 
 
 class PizzaCozyTestCase(TestCase):
