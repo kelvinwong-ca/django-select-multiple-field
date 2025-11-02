@@ -2,6 +2,8 @@
 django-select-multiple-field
 ****************************
 
+   After a long hiatus, I am updating this package to support Django 4.2-LTS & 5.2-LTS. Stay tuned. 2-Nov-2025.
+
 Select multiple choices in a single Django model field. Use whenever you want
 to store multiple choices in a field without using a many-to-many relation.
 
