@@ -7,7 +7,7 @@ name = "django-select-multiple-field"
 version = "0.4.3"
 description = "Select multiple choices in a single Django model field"
 readme = "README.rst"
-license = {text = "BSD-3-Clause"}
+license = {text = "BSD"}
 authors = [
     {name = "Kelvin Wong", email = "code@kelvinwong.ca"}
 ]
