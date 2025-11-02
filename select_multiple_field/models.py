@@ -131,7 +131,9 @@ class SelectMultipleField(models.CharField):
 
         field_options = {"include_blank": include_blank}
         field_options.update(kwargs)
-        return super(SelectMultipleField, self).get_choices(**field_options)
+        choices = super(SelectMultipleField, self).get_choices(**field_options)
+        # Convert to list for backwards compatibility
+        return list(choices)
 
     def has_choices(self):
         """
@@ -206,6 +208,7 @@ class SelectMultipleField(models.CharField):
         """
         flat_choices = []
         choices = self.get_choices(**kwargs)
+        # Ensure choices is a list (already handled by get_choices method)
         for key, val in choices:
             if isinstance(val, (list, tuple)):
                 for opt_key, opt_val in val:
