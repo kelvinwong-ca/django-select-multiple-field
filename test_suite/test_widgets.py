@@ -63,13 +63,3 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         self.assertIn(self.choices[0][0], obj)
         self.assertNotIn(self.choices[1][0], obj)
         self.assertIn(self.choices[2][0], obj)
-        #
-        # MergeDict are generated from QueryDict which are subclasses of
-        # MultiValueDict
-        #
-        # data_obj = MergeDict(MultiValueDict(data))
-        # obj = w.value_from_datadict(data_obj, None, name)
-        # self.assertIsInstance(obj, list)
-        # self.assertIn(self.choices[0][0], obj)
-        # self.assertNotIn(self.choices[1][0], obj)
-        # self.assertIn(self.choices[2][0], obj)
