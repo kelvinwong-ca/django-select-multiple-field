@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-from setuptools import setup, Command
 import os
 import re
 import sys
+
+from setuptools import Command, setup
 
 REPO_BASE = os.path.abspath(os.path.dirname(__file__))
 
@@ -31,13 +32,8 @@ class DemoTester(Command):
 
     user_options = []
     test_settings = {
-        "1.4": "test_projects.django14.django14.settings",
-        "1.5": "test_projects.django14.django14.settings",
-        "1.6": "test_projects.django14.django14.settings",
-        "1.7": "test_projects.django14.django14.settings",
-        "1.8": "test_projects.django18.django18.settings",
-        "1.9": "test_projects.django18.django18.settings",
-        "1.10": "test_projects.django18.django18.settings",
+        "4.2": "test_projects.django42.django42.settings",
+        "5.2": "test_projects.django42.django42.settings",
     }
 
     def initialize_options(self):
@@ -58,32 +54,22 @@ class DemoTester(Command):
             # Pre-release Djangos must be testable!!!
             dj_too_old = False
         else:
-            dj_too_old = dj_ver < [1, 4, 2]
+            dj_too_old = dj_ver < [4, 2, 0]
 
         if test_settings_exist is False or dj_too_old:
-            print("Please install Django 1.4.19 - 1.10 to run the test suite")
+            print("Please install Django 4.2.0 - 5.2 to run the test suite")
             exit(-1)
         os.environ["DJANGO_SETTINGS_MODULE"] = self.test_settings[django_release]
-        try:
-            from django.core.management import call_command
-        except ImportError:
-            print("Please install Django 1.4.19 - 1.10 to run the test suite")
-            exit(-1)
 
         import django
 
         if hasattr(django, "setup"):
             django.setup()
 
+        from django.core.management import call_command
+
         call_command("test", "pizzagigi", interactive=False, verbosity=1)
         call_command("test", "forthewing", interactive=False, verbosity=1)
-
-        try:
-            import south
-        except ImportError:
-            pass
-        else:
-            call_command("test", "suthern", interactive=False, verbosity=1)
 
 
 cmdclasses["test_demo"] = DemoTester
