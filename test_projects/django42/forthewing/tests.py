@@ -41,7 +41,7 @@ class ChickenWingsCreateViewTestCase(TestCase):
             urlencode(MultiValueDict(data), doseq=True),
             content_type="application/x-www-form-urlencoded",
         )
-        self.assertRedirects(response, "http://testserver" + reverse("ftw:created"))
+        self.assertRedirects(response, reverse("ftw:created"))
         p = ChickenWings.objects.all()[0]
         self.assertIn(ChickenWings.JERK, p.flavour)
 
@@ -52,7 +52,7 @@ class ChickenWingsCreateViewTestCase(TestCase):
             urlencode(MultiValueDict(data), doseq=True),
             content_type="application/x-www-form-urlencoded",
         )
-        self.assertRedirects(response, "http://testserver" + reverse("ftw:created"))
+        self.assertRedirects(response, reverse("ftw:created"))
         p = ChickenWings.objects.all()[0]
         self.assertIn(ChickenWings.SUICIDE, p.flavour)
         self.assertIn(ChickenWings.BOURBON, p.flavour)
@@ -98,7 +98,7 @@ class ChickenWingsUpdateViewTestCase(TestCase):
             urlencode(MultiValueDict(data), doseq=True),
             content_type="application/x-www-form-urlencoded",
         )
-        self.assertRedirects(response, "http://testserver" + reverse("ftw:updated"))
+        self.assertRedirects(response, reverse("ftw:updated"))
         p = ChickenWings.objects.all()[0]
         self.assertTrue(ChickenWings.MEDIUM in p.flavour)
         self.assertFalse(ChickenWings.THAI in p.flavour)
@@ -113,7 +113,7 @@ class ChickenWingsDeleteViewTestCase(TestCase):
 
     def test_delete_chickenwings(self):
         response = self.client.post(reverse("ftw:delete", args=[self.chickenwings.id]))
-        self.assertRedirects(response, "http://testserver" + reverse("ftw:deleted"))
+        self.assertRedirects(response, reverse("ftw:deleted"))
         pl = ChickenWings.objects.all()
         self.assertEqual(len(pl), 0)
 

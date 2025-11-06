@@ -48,7 +48,7 @@ class PizzaCreateViewTestCase(TestCase):
         )
 
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, "http://testserver" + reverse("pizza:created"))
+        self.assertRedirects(response, reverse("pizza:created"))
         p = Pizza.objects.all()[0]
         self.assertIn(Pizza.BLACK_OLIVES, p.toppings)
 
@@ -60,7 +60,7 @@ class PizzaCreateViewTestCase(TestCase):
             content_type="application/x-www-form-urlencoded",
         )
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, "http://testserver" + reverse("pizza:created"))
+        self.assertRedirects(response, reverse("pizza:created"))
         p = Pizza.objects.all()[0]
         self.assertIn(Pizza.MOZZARELLA, p.toppings)
         self.assertIn(Pizza.PANCETTA, p.toppings)
@@ -92,7 +92,7 @@ class PizzaUpdateViewTestCase(TestCase):
             content_type="application/x-www-form-urlencoded",
         )
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, "http://testserver" + reverse("pizza:updated"))
+        self.assertRedirects(response, reverse("pizza:updated"))
         p = Pizza.objects.all()[0]
         self.assertTrue(Pizza.CHEDDAR_CHEESE in p.toppings)
         self.assertTrue(Pizza.MUSHROOMS in p.toppings)
@@ -108,7 +108,7 @@ class PizzaDeleteViewTestCase(TestCase):
     def test_delete_pizza(self):
         response = self.client.post(reverse("pizza:delete", args=[self.pizza.id]))
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, "http://testserver" + reverse("pizza:deleted"))
+        self.assertRedirects(response, reverse("pizza:deleted"))
         pl = Pizza.objects.all()
         self.assertEqual(len(pl), 0)
 
