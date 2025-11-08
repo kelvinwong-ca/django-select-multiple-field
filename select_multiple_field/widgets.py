@@ -9,7 +9,7 @@ class SelectMultipleField(widgets.SelectMultiple):
 
     allow_multiple_selected = True
 
-    def render(self, name, value, attrs=None, choices=()):
+    def render(self, name, value, attrs=None, choices=(), renderer=None):
         rendered_attrs = {"class": HTML_ATTR_CLASS}
         if attrs:
             rendered_attrs.update(attrs)
@@ -21,7 +21,12 @@ class SelectMultipleField(widgets.SelectMultiple):
             self.choices = choices
 
         # Use parent's render method and just ensure our class is added
-        return super().render(name, value, attrs=rendered_attrs)
+        if renderer is not None:
+            # Pass renderer parameter for Django 5.x compatibility
+            return super().render(name, value, attrs=rendered_attrs, renderer=renderer)
+        else:
+            # Fallback for Django < 5.x
+            return super().render(name, value, attrs=rendered_attrs)
 
     def value_from_datadict(self, data, files, name):
         """
