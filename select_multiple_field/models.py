@@ -88,7 +88,7 @@ class SelectMultipleField(models.CharField):
         msg = self.error_messages["invalid_type"] % {"value": type(value)}
         raise exceptions.ValidationError(msg)
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection, context=None):
         """
         Converts a value as returned by the database to a Python object.
         It is the reverse of get_prep_value().
@@ -149,9 +149,12 @@ class SelectMultipleField(models.CharField):
         """
         Used for serialization of the expected Python list
         """
-        native = self._get_val_from_obj(obj)
+        if hasattr(self, "value_from_object"):
+            native = self.value_from_object(obj)
+        else:
+            # Fallback for older Django versions
+            native = getattr(obj, self.attname)
         return native
-        # return smart_text(self._get_val_from_obj(obj))  # Default code
 
     def validate(self, value, model_instance):
         """
