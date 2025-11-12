@@ -36,10 +36,10 @@ class ChickenWings(models.Model):
             _("Sweets"),
             (
                 (HONEY_GARLIC, _("Honey garlic")),
-                (HONEY_BBQ, _("Honey barbeque")),
+                (HONEY_BBQ, _("Honey barbecue")),
                 (THAI, _("Thai sweet sauce")),
                 (BACON, _("Messy bacon sauce")),
-                (BOURBON, _("Bourbon whiskey barbeque")),
+                (BOURBON, _("Bourbon whiskey barbecue")),
             ),
         ),
     )

@@ -8,15 +8,53 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='ChickenWings',
+            name="ChickenWings",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('flavour', select_multiple_field.models.SelectMultipleField(blank=True, choices=[('Hot & Spicy', (('s', 'Suicide hot'), ('h', 'Hot hot sauce'), ('m', 'Medium hot sauce'), ('M', 'Mild hot sauce'), ('c', 'Cajun sauce'), ('j', 'Jerk sauce'))), ('Sweets', (('g', 'Honey garlic'), ('H', 'Honey barbeque'), ('t', 'Thai sweet sauce'), ('b', 'Messy bacon sauce'), ('B', 'Bourbon whiskey barbeque')))], include_blank=False, max_choices=2, max_length=5)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "flavour",
+                    select_multiple_field.models.SelectMultipleField(
+                        blank=True,
+                        choices=[
+                            (
+                                "Hot & Spicy",
+                                (
+                                    ("s", "Suicide hot"),
+                                    ("h", "Hot hot sauce"),
+                                    ("m", "Medium hot sauce"),
+                                    ("M", "Mild hot sauce"),
+                                    ("c", "Cajun sauce"),
+                                    ("j", "Jerk sauce"),
+                                ),
+                            ),
+                            (
+                                "Sweets",
+                                (
+                                    ("g", "Honey garlic"),
+                                    ("H", "Honey barbecue"),
+                                    ("t", "Thai sweet sauce"),
+                                    ("b", "Messy bacon sauce"),
+                                    ("B", "Bourbon whiskey barbecue"),
+                                ),
+                            ),
+                        ],
+                        include_blank=False,
+                        max_choices=2,
+                        max_length=5,
+                    ),
+                ),
             ],
         ),
     ]
