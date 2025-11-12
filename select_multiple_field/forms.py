@@ -6,8 +6,8 @@ from .codecs import decode_csv_to_list
 from .widgets import SelectMultipleField
 
 
-DEFAULT_DELIMITER = ','
-DEFAULT_MAX_CHOICES_ATTR = 'data-max-choices'
+DEFAULT_DELIMITER = ","
+DEFAULT_MAX_CHOICES_ATTR = "data-max-choices"
 
 
 class SelectMultipleFormField(fields.MultipleChoiceField):
@@ -15,9 +15,14 @@ class SelectMultipleFormField(fields.MultipleChoiceField):
     widget = SelectMultipleField
 
     def __init__(
-            self, max_length=None, size=4, max_choices=None,
-            max_choices_attr=DEFAULT_MAX_CHOICES_ATTR,
-            *args, **kwargs):
+        self,
+        max_length=None,
+        size=4,
+        max_choices=None,
+        max_choices_attr=DEFAULT_MAX_CHOICES_ATTR,
+        *args,
+        **kwargs,
+    ):
         """
         max_length refers to number of characters used to store the encoded
         list of choices (est. 2n - 1)
@@ -37,9 +42,9 @@ class SelectMultipleFormField(fields.MultipleChoiceField):
         """
         self.max_length, self.max_choices = max_length, max_choices
         self.size, self.max_choices_attr = size, max_choices_attr
-        self.coerce = kwargs.pop('coerce', lambda val: val)
-        self.empty_value = kwargs.pop('empty_value', [])
-        if not hasattr(self, 'empty_values'):
+        self.coerce = kwargs.pop("coerce", lambda val: val)
+        self.empty_value = kwargs.pop("empty_value", [])
+        if not hasattr(self, "empty_values"):
             self.empty_values = list(validators.EMPTY_VALUES)
         super(SelectMultipleFormField, self).__init__(*args, **kwargs)
 
@@ -72,14 +77,15 @@ class SelectMultipleFormField(fields.MultipleChoiceField):
         Prepares a string for use in serializer
         """
         delimiter = getattr(
-            settings, 'SELECTMULTIPLEFIELD_DELIMITER', DEFAULT_DELIMITER)
+            settings, "SELECTMULTIPLEFIELD_DELIMITER", DEFAULT_DELIMITER
+        )
         if isinstance(value, (list, tuple)):
             if len(value) == 0:
-                return ''
+                return ""
             else:
                 return delimiter.join(value)
 
-        return ''
+        return ""
 
     # def validate(self, value):
     #     checked_out = True
@@ -97,7 +103,7 @@ class SelectMultipleFormField(fields.MultipleChoiceField):
         """
         attrs = super(SelectMultipleFormField, self).widget_attrs(widget)
         if self.size != 4:
-            attrs.update({'size': str(self.size)})
+            attrs.update({"size": str(self.size)})
 
         if self.max_choices:
             attrs.update({self.max_choices_attr: str(self.max_choices)})
