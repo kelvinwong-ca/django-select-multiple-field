@@ -3,10 +3,7 @@
 {% load i18n static %}
 
 
-{% block html_tag_replacement %}
-<!--[if IE 8]>         <html class="no-js lt-ie9" lang="{{ LANGUAGE_CODE }}" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="{{ LANGUAGE_CODE }}" >    <!--<![endif]-->
-{% endblock %}
+{% block html_tag_replacement %}<html class="no-js" lang="{{ LANGUAGE_CODE }}" >{% endblock %}
 
 
 {% block base_head %}
@@ -21,7 +18,7 @@
 
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
-  <link href="{{ STATIC_URL }}css/app.css" rel="stylesheet">
+  {% comment %} <link href="{{ STATIC_URL }}css/app.css" rel="stylesheet"> {% endcomment %}
 
   {% endblock %}
   {% block extra_head %}{% endblock %}
