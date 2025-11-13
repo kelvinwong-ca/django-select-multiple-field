@@ -79,7 +79,7 @@ class SelectMultipleFormFieldTestCase(SimpleTestCase):
         self.assertTrue(ff.max_choices is None)
         self.assertNotIn("data-max-choices", ff.widget_attrs(fake_widget))
         #
-        # Case #2: When set, max_coices passed as data attribute
+        # Case #2: When set, max_choices passed as data attribute
         #
         MAX_CHOICES = 3
         ff = SelectMultipleFormField(max_choices=MAX_CHOICES)
