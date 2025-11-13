@@ -5,10 +5,10 @@ from django.utils.encoding import force_str
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
-from .codecs import decode_csv_to_list, encode_list_to_csv
-from .validators import MaxChoicesValidator, MaxLengthValidator
 import select_multiple_field.forms as forms
 
+from .codecs import decode_csv_to_list, encode_list_to_csv
+from .validators import MaxChoicesValidator, MaxLengthValidator
 
 DEFAULT_DELIMITER = ","
 

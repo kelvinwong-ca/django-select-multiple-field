@@ -1,6 +1,5 @@
 from django.forms import widgets
 
-
 HTML_ATTR_CLASS = "select-multiple-field"
 
 
