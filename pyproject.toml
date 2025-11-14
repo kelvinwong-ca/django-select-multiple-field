@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-select-multiple-field"
-version = "0.4.3"
+version = "1.0.0.dev1"
 description = "Select multiple choices in a single Django model field"
 readme = "README.rst"
 license = {text = "BSD"}
