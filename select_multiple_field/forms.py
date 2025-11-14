@@ -57,7 +57,12 @@ class SelectMultipleFormField(fields.MultipleChoiceField):
         Method also handles lists and strings
         """
         if (value == self.empty_value) or (value in self.empty_values):
-            return self.empty_value
+            try:
+                # must be iterable
+                iter(self.empty_value)
+                return self.empty_value
+            except TypeError:
+                return []
 
         if isinstance(value, str):
             if len(value) == 0:
