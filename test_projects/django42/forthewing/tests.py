@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils.datastructures import MultiValueDict
 from django.utils.http import urlencode
 
+from .forms import BLUE_CHEESE, HONEY_MUSTARD, RANCH, DipsForm
 from .models import ChickenWings, show_flavour
 
 
@@ -147,3 +148,15 @@ class ChickenWingsModelTestCase(SimpleTestCase):
             else:
                 flavour_name = show_flavour(k)
                 self.assertEqual(flavour_name, v)
+
+
+class DipsFormTestCase(TestCase):
+
+    def test_valid_choices(self):
+        form = DipsForm(data={"dips": [RANCH, BLUE_CHEESE]})
+        self.assertTrue(form.is_valid())
+
+    def test_no_choice_selected(self):
+        form = DipsForm(data={"dips": []})
+        self.assertTrue(form.is_valid())
+        print(form.cleaned_data)
