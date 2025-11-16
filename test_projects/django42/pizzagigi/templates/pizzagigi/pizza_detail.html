@@ -24,11 +24,21 @@
 
   <p class="lead">{% trans 'The pizza contains the following yummy ingredients' %}</p>
 
+  <h2>{% trans 'Toppings' %}</h2>
   <ul>
     {% for topping in pizza.toppings %}
     <li>{{ topping|decode_topping }}</li>
     {% empty %}
     <li>{% trans 'No toppings' %}
+    {% endfor %}
+  </ul>
+
+  <h2>{% trans 'Dips' %}</h2>
+  <ul>
+    {% for dip in pizza.dips %}
+    <li>{{ dip|decode_dip }}</li>
+    {% empty %}
+    <li>{% trans 'No dips' %}
     {% endfor %}
   </ul>
 

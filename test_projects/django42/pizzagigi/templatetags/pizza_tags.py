@@ -1,7 +1,5 @@
 from django import template
-
-from pizzagigi.models import show_topping
-
+from pizzagigi.models import show_dip, show_topping
 
 register = template.Library()
 
@@ -26,3 +24,13 @@ def decode_topping(ingredient):
 
 
 register.filter("decode_topping", decode_topping)
+
+
+def decode_dip(dip):
+    """
+    Decode a single pizza dip
+    """
+    return show_dip(dip)
+
+
+register.filter("decode_dip", decode_dip)

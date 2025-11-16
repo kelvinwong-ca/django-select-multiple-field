@@ -32,7 +32,25 @@ class Pizza(models.Model):
         (TOMATO, _("Tomato")),
     )
 
+    RANCH = "r"
+    BLUE_CHEESE = "b"
+    HONEY_MUSTARD = "h"
+    DIP_CHOICES = (
+        (RANCH, _("Ranch")),
+        (BLUE_CHEESE, _("Blue cheese")),
+        (HONEY_MUSTARD, _("Honey mustard")),
+    )
+
+    # Most common field usage
     toppings = SelectMultipleField(max_length=10, choices=TOPPING_CHOICES)
+
+    # Allows NULL or text to be stored
+    dips = SelectMultipleField(
+        max_length=5,
+        choices=DIP_CHOICES,
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         verbose_name = _("Pizza")
@@ -59,3 +77,11 @@ def show_topping(ingredient):
     """
     decoder = dict(Pizza.TOPPING_CHOICES)
     return force_str(decoder[ingredient])
+
+
+def show_dip(dip):
+    """
+    Decode dip to full name
+    """
+    decoder = dict(Pizza.DIP_CHOICES)
+    return force_str(decoder[dip])

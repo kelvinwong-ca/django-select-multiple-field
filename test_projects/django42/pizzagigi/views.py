@@ -21,7 +21,7 @@ class PizzaListView(ListView):
 class PizzaCreateView(CreateView):
 
     model = Pizza
-    fields = ["toppings"]
+    fields = ["toppings", "dips"]
     success_url = reverse_lazy("pizza:created")
 
 
@@ -33,7 +33,7 @@ class PizzaDetailView(DetailView):
 class PizzaUpdateView(UpdateView):
 
     model = Pizza
-    fields = ["toppings"]
+    fields = ["toppings", "dips"]
     success_url = reverse_lazy("pizza:updated")
 
 
