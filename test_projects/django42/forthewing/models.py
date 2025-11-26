@@ -50,12 +50,21 @@ class ChickenWings(models.Model):
         max_choices=2,
         choices=FLAVOUR_CHOICES,
     )
+    optional_flavour = SelectMultipleField(
+        blank=True,
+        null=True,
+        max_length=5,
+        choices=FLAVOUR_CHOICES,
+    )
 
     def __str__(self):
         return "pk=%s" % force_str(self.pk)
 
     def get_absolute_url(self):
         return reverse("ftw:detail", args=[self.pk])
+
+    class Meta:
+        app_label = "forthewing"
 
 
 def show_flavour(flavour):

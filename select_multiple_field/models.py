@@ -1,4 +1,5 @@
-import django
+import warnings
+
 from django.core import exceptions, validators
 from django.db import models
 from django.utils.encoding import force_str
@@ -9,8 +10,6 @@ import select_multiple_field.forms as forms
 
 from .codecs import decode_csv_to_list, encode_list_to_csv
 from .validators import MaxChoicesValidator, MaxLengthValidator
-
-DEFAULT_DELIMITER = ","
 
 
 class SelectMultipleField(models.CharField):
@@ -23,7 +22,7 @@ class SelectMultipleField(models.CharField):
             "not '%(value)s'."
         ),
         "invalid_choice": _(
-            "Select a valid choice. %(value)s is not one of the available " "choices."
+            "Select a valid choice. %(value)s is not one of the available choices."
         ),
         "null": _("This field cannot be null."),
     }
@@ -31,30 +30,91 @@ class SelectMultipleField(models.CharField):
 
     def __init__(self, *args, **kwargs):
         """
-        SelectMultipleField rejects items with no answer by default
+        Stores selected choices as CSV in the database and as list-like values
+        in Python.
 
-        By default responses are required, so 'blank' is False
+        Behavior notes:
+
+        - `blank=False` means a value is required by field validation.
+        - `null=True` stores SQL NULL for empty values in the database.
+        - Python-side normalization converts `None` to an empty list in
+            `to_python()` / `from_db_value()` for a consistent in-memory API.
+        - If `choices` and `max_choices` are set and `max_length` is omitted,
+            `max_length` is computed from the longest possible encoded CSV value.
+        - If `max_length` is explicitly provided but is smaller than that
+            computed encoded length, a `RuntimeWarning` is emitted.
+
+        Extra kwargs:
+
+        - `max_choices`: optional positive integer that limits the number of
+            selected options.
         """
+        self.max_choices = None
+        self.include_blank = False
+        self._include_blank_set = False
+
+        kwargs = kwargs.copy()
+
         if "max_choices" in kwargs:
-            self.max_choices = kwargs.pop("max_choices")
+            max_choices = kwargs.pop("max_choices")
+            if max_choices is not None:
+                if not isinstance(max_choices, int) or max_choices <= 0:
+                    raise ValueError("max_choices must be a positive integer")
+                self.max_choices = max_choices
 
         if "include_blank" in kwargs:
-            self.include_blank = kwargs.pop("include_blank")
+            #
+            # include_blank is deprecated but retained for migration compatibility.
+            #
+            include_blank = kwargs.pop("include_blank")
+            if not isinstance(include_blank, bool):
+                raise TypeError("include_blank must be a boolean")
+            self.include_blank = include_blank
+            self._include_blank_set = True
+
+        explicit_max_length = "max_length" in kwargs
 
         super(SelectMultipleField, self).__init__(*args, **kwargs)
 
-        # remove CharField's MaxLengthValidator
-        if self.validators and isinstance(
-            self.validators[-1], validators.MaxLengthValidator
-        ):
-            self.validators = self.validators[:-1]
+        if self.max_length is None and self.choices and self.max_choices is not None:
+            self.max_length = self._calculate_max_encoded_length()
+        elif explicit_max_length and self.choices and self.max_choices is not None:
+            calculated = self._calculate_max_encoded_length()
+            if self.max_length < calculated:
+                warnings.warn(
+                    f"max_length={self.max_length} is too small for max_choices={self.max_choices} "
+                    f"with choices={list(self.get_choices_keys())}. "
+                    f"Encoded CSV will be up to {calculated} chars. "
+                    f"Validation will fail for max selections.",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
+
+        self.validators = [
+            v
+            for v in self.validators
+            if not isinstance(v, validators.MaxLengthValidator)
+        ]
 
         self.validators.append(MaxLengthValidator(self.max_length))
-        if hasattr(self, "max_choices"):
+        if self.max_choices is not None:
             self.validators.append(MaxChoicesValidator(self.max_choices))
 
-    def __str__(self):
-        return "%s" % force_str(self.description)
+    def _calculate_max_encoded_length(self):
+        """
+        Calculate max encoded CSV length from choices and max_choices.
+
+        Returns the max possible length of the CSV string when max_choices
+        are selected (choices joined by commas).
+        """
+        choice_keys = self.get_choices_keys()
+        if not choice_keys:
+            return 0
+
+        sorted_keys = sorted(choice_keys, key=len, reverse=True)
+        max_keys = sorted_keys[: self.max_choices]
+
+        return len(",".join(max_keys))
 
     def get_internal_type(self):
         return "CharField"
@@ -72,7 +132,7 @@ class SelectMultipleField(models.CharField):
         Returns list
         """
         if value is None:
-            return value
+            return []
 
         elif isinstance(value, (list, tuple)):
             self.validate_options_list(value)
@@ -92,25 +152,37 @@ class SelectMultipleField(models.CharField):
         """
         Converts a value as returned by the database to a Python object.
         It is the reverse of get_prep_value().
-        """
-        if value is None:
-            return None
 
+        This should always return a Python list.
+        """
         if isinstance(value, str):
             return decode_csv_to_list(value)
-        return value
+        return []
 
     def get_prep_value(self, value):
         """
         Perform preliminary non-db specific value checks and conversions.
 
-        This takes a Python list and encodes it into a form storable in the
-        database
+        This takes a Python list and encodes it into a string form representable
+        in the database.
 
-        Returns a string or None
+        If value is already a string (e.g. from a raw ORM lookup like
+        .filter(tags="django,api")), it is returned as-is to avoid
+        double-encoding.
+
+        Returns a string or None (if null=True and value is empty)
         """
         if value is None:
-            return None
+            return None if self.null else ""
+
+        # Handle already-encoded CSV string (for query lookups)
+        if isinstance(value, str):
+            return value
+
+        if len(value) == 0:
+            if self.null:
+                return None
+            return ""
 
         return encode_list_to_csv(value)
 
@@ -124,15 +196,17 @@ class SelectMultipleField(models.CharField):
         kwargs
         """
         include_blank = False
-        if hasattr(self, "include_blank"):
+        if getattr(self, "_include_blank_set", False):
             include_blank = self.include_blank
             if "include_blank" in kwargs:
                 kwargs.pop("include_blank")
+        else:
+            include_blank = kwargs.pop("include_blank", False)
 
         field_options = {"include_blank": include_blank}
         field_options.update(kwargs)
         choices = super(SelectMultipleField, self).get_choices(**field_options)
-        # Convert to list for backwards compatibility
+        # Convert to list for Django < 5.0 compatibility (parent returns iterable in 5.0+)
         return list(choices)
 
     def has_choices(self):
@@ -154,7 +228,7 @@ class SelectMultipleField(models.CharField):
         else:
             # Fallback for older Django versions
             native = getattr(obj, self.attname)
-        return native
+        return encode_list_to_csv(native)
 
     def validate(self, value, model_instance):
         """
@@ -162,31 +236,43 @@ class SelectMultipleField(models.CharField):
         this to provide validation logic.
         """
         if not self.editable:
-            # Skip validation for non-editable fields.
             return
+
+        if isinstance(value, str):
+            value = decode_csv_to_list(value)
+
+        # Replicate parent Field.validate() blank/null/choice checks.
+        # We don't call super().validate() because with choices set
+        # and value as a list, the parent tries to match the list
+        # against choice keys, which always fails for multi-select values.
+        # Note: run_validators() is called by Field.clean() after validate(),
+        # so we don't call it here.
+        if not self.blank and value in validators.EMPTY_VALUES:
+            raise exceptions.ValidationError(self.error_messages["blank"], code="blank")
+        if value is None and not self.null:
+            raise exceptions.ValidationError(self.error_messages["null"], code="null")
 
         if self.has_choices() and value:
             if isinstance(value, (list, tuple)):
-                bad_values = []
-                for opt in value:
-                    if self.blank and opt in validators.EMPTY_VALUES:
-                        pass
-                    elif opt not in self.get_choices_keys():
-                        bad_values.append(opt)
-                if len(bad_values) == 0:
-                    return
-                else:
+                bad_values = self._find_invalid_choices(value)
+                if bad_values:
                     msg = self.error_messages["invalid_choice"] % {"value": bad_values}
                     raise exceptions.ValidationError(msg)
+            else:
+                msg = self.error_messages["invalid_choice"] % {"value": value}
+                raise exceptions.ValidationError(msg)
 
-            msg = self.error_messages["invalid_choice"] % {"value": value}
-            raise exceptions.ValidationError(msg)
-
-        if value is None and not self.null:
-            raise exceptions.ValidationError(self.error_messages["null"])
-
-        if not self.blank and value in validators.EMPTY_VALUES:
-            raise exceptions.ValidationError(self.error_messages["blank"])
+    def _find_invalid_choices(self, value):
+        """
+        Returns a list of invalid choices in value that are not in the field's choices.
+        """
+        bad_values = []
+        for opt in value:
+            if self.blank and opt in validators.EMPTY_VALUES:
+                pass
+            elif opt not in self.get_choices_keys():
+                bad_values.append(opt)
+        return bad_values
 
     def validate_options_list(self, value):
         """
@@ -196,12 +282,10 @@ class SelectMultipleField(models.CharField):
 
         Returns None if all values are in choices
         """
-        for option in value:
-            if not self.validate_option(option):
-                msg = self.error_messages["invalid_choice"] % {"value": option}
-                raise exceptions.ValidationError(msg)
-
-        return
+        bad_values = self._find_invalid_choices(value)
+        if bad_values:
+            msg = self.error_messages["invalid_choice"] % {"value": bad_values}
+            raise exceptions.ValidationError(msg)
 
     def get_choices_keys(self, **kwargs):
         """
@@ -209,21 +293,27 @@ class SelectMultipleField(models.CharField):
 
         Returns choices keys as list
         """
-        flat_choices = []
+        if not kwargs and hasattr(self, "_flat_choices_cache"):
+            return self._flat_choices_cache
+
         choices = self.get_choices(**kwargs)
-        # Ensure choices is a list (already handled by get_choices method)
+        flat = []
         for key, val in choices:
             if isinstance(val, (list, tuple)):
                 for opt_key, opt_val in val:
-                    flat_choices.append(opt_key)
+                    flat.append(opt_key)
             else:
-                flat_choices.append(key)
+                flat.append(key)
 
-        return flat_choices
+        if not kwargs:
+            self._flat_choices_cache = flat
+        return flat
 
     def validate_option(self, value):
         """
-        Checks that value is in choices
+        Legacy helper not used by the field's internal validation flow.
+
+        Checks that value is in choices.
         """
         if self.blank and value in validators.EMPTY_VALUES:
             return True
@@ -251,53 +341,28 @@ class SelectMultipleField(models.CharField):
 
         if self.choices:
             # Django normally includes an empty choice if blank, has_default
-            # and initial are all False, we are intentially breaking this
+            # and initial are all False, we are intentionally breaking this
             # convention
             include_blank = self.blank
             defaults["choices"] = self.get_choices(include_blank=include_blank)
-            defaults["coerce"] = self.to_python
             if self.null:
                 defaults["empty_value"] = None
 
-            # Many of the subclass-specific formfield arguments (min_value,
-            # max_value) don't apply for choice fields, so be sure to only pass
-            # the values that SelectMultipleFormField will understand.
-            for k in kwargs.keys():
-                if k not in (
-                    "coerce",
-                    "empty_value",
-                    "choices",
-                    "required",
-                    "widget",
-                    "label",
-                    "initial",
-                    "help_text",
-                    "error_messages",
-                    "show_hidden_initial",
-                ):
-                    del kwargs[k]
+            allowed = {
+                "empty_value",
+                "choices",
+                "required",
+                "widget",
+                "label",
+                "initial",
+                "help_text",
+                "error_messages",
+                "show_hidden_initial",
+            }
+            kwargs = {k: v for k, v in kwargs.items() if k in allowed}
 
         defaults.update(kwargs)
         return forms.SelectMultipleFormField(**defaults)
-
-    def south_field_triple(self):
-        try:
-            from south.modelsinspector import introspector
-        except ImportError:
-            pass
-        else:
-            cls_name = "{}.{}".format(
-                self.__class__.__module__, self.__class__.__name__
-            )
-            args, kwargs = introspector(self)
-
-            if hasattr(self, "max_choices"):
-                kwargs["max_choices"] = self.max_choices
-
-            if hasattr(self, "include_blank"):
-                kwargs["include_blank"] = self.include_blank
-
-            return (cls_name, args, kwargs)
 
     def deconstruct(self):
         """
@@ -306,17 +371,17 @@ class SelectMultipleField(models.CharField):
         The arguments to pass to field constructor to reconstruct it.
 
         Returns a tuple of four items:
-            the field’s attribute name,
+            the field's attribute name,
             the full import path of the field class,
             the positional arguments (an empty list in this case),
             the keyword arguments (as a dict).
         """
         name, path, args, kwargs = super(SelectMultipleField, self).deconstruct()
 
-        if hasattr(self, "max_choices"):
+        if self.max_choices is not None:
             kwargs["max_choices"] = self.max_choices
 
-        if hasattr(self, "include_blank"):
+        if getattr(self, "_include_blank_set", False):
             kwargs["include_blank"] = self.include_blank
 
         return (

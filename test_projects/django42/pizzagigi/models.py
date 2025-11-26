@@ -44,7 +44,7 @@ class Pizza(models.Model):
     # Most common field usage
     toppings = SelectMultipleField(max_length=10, choices=TOPPING_CHOICES)
 
-    # Allows NULL or text to be stored
+    # Some fields can be optional
     dips = SelectMultipleField(
         max_length=5,
         choices=DIP_CHOICES,
@@ -56,6 +56,7 @@ class Pizza(models.Model):
         verbose_name = _("Pizza")
         verbose_name_plural = _("Pizzas")
         ordering = ["pk"]
+        app_label = "pizzagigi"
 
     def get_toppings(self):
         if self.toppings:
@@ -76,7 +77,7 @@ def show_topping(ingredient):
     Decode topping to full name
     """
     decoder = dict(Pizza.TOPPING_CHOICES)
-    return force_str(decoder[ingredient])
+    return force_str(decoder.get(ingredient, ingredient))
 
 
 def show_dip(dip):
@@ -84,4 +85,4 @@ def show_dip(dip):
     Decode dip to full name
     """
     decoder = dict(Pizza.DIP_CHOICES)
-    return force_str(decoder[dip])
+    return force_str(decoder.get(dip, dip))

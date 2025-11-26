@@ -2,6 +2,7 @@ import string
 
 from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase
+from django.utils.module_loading import import_string
 
 from select_multiple_field.codecs import encode_list_to_csv
 from select_multiple_field.models import SelectMultipleField
@@ -65,6 +66,11 @@ class SelectMultipleFieldValidatorsTestCase(SimpleTestCase):
                 % {"limit_value": item.max_choices, "show_value": many_choices_len},
             )
 
+    def test_max_choices_empty_list(self):
+        """Empty list always passes MaxChoicesValidator (0 items <= max_choices)"""
+        item = SelectMultipleField(choices=self.choices, max_length=254, max_choices=1)
+        self.assertIs(item.run_validators(value=[]), None)
+
     def test_max_length_single(self):
         item = SelectMultipleField(choices=self.choices, max_length=1)
         self.assertEqual(item.max_length, 1)
@@ -113,3 +119,31 @@ class SelectMultipleFieldValidatorsTestCase(SimpleTestCase):
                 MaxLengthValidator.message
                 % {"limit_value": item.max_length, "show_value": many_choices_len},
             )
+
+    def test_max_length_empty_list(self):
+        """Empty list always passes MaxLengthValidator (encoded '' is 0 chars)"""
+        item = SelectMultipleField(choices=self.choices, max_length=1)
+        self.assertIs(item.run_validators(value=[]), None)
+
+    def test_max_length_zero(self):
+        """max_length=0 only allows empty list (encoded '' is 0 chars)"""
+        item = SelectMultipleField(choices=self.choices, max_length=0)
+        self.assertIs(item.run_validators(value=[]), None)
+        with self.assertRaises(ValidationError):
+            item.run_validators(value=["a"])
+
+    def test_max_choices_validator_deconstruct(self):
+        """MaxChoicesValidator can be deconstructed and reconstructed for migrations"""
+        v = MaxChoicesValidator(5)
+        path, args, kwargs = v.deconstruct()
+        cls = import_string(path)
+        rebuilt = cls(*args, **kwargs)
+        self.assertEqual(rebuilt.limit_value, 5)
+
+    def test_max_length_validator_deconstruct(self):
+        """MaxLengthValidator can be deconstructed and reconstructed for migrations"""
+        v = MaxLengthValidator(100)
+        path, args, kwargs = v.deconstruct()
+        cls = import_string(path)
+        rebuilt = cls(*args, **kwargs)
+        self.assertEqual(rebuilt.limit_value, 100)

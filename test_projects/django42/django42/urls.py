@@ -23,5 +23,6 @@ urlpatterns = [
     path("", TemplateView.as_view(template_name="app/home.html"), name="home"),
     path("pizzagigi/", include("pizzagigi.urls", namespace="pizza")),
     path("forthewing/", include("forthewing.urls", namespace="ftw")),
+    path("orm/", include("orm_test.urls", namespace="orm")),
     path("admin/", admin.site.urls),
 ]

@@ -1,1 +1,3 @@
-__version__ = "1.0.0.dev1"
+from .__about__ import __version__
+
+DEFAULT_DELIMITER = ","

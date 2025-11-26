@@ -1,12 +1,12 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "django-select-multiple-field"
-version = "1.0.0.dev1"
+dynamic = ["version"]
 description = "Select multiple choices in a single Django model field"
-readme = "README.rst"
+readme = "README.md"
 license = {text = "BSD"}
 authors = [
     {name = "Kelvin Wong", email = "code@kelvinwong.ca"}
@@ -36,8 +36,43 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/kelvinwong-ca/django-select-multiple-field"
+Homepage = "https://kelvinwong.ca/projects/django-select-multiple-field/"
 Repository = "https://github.com/kelvinwong-ca/django-select-multiple-field"
 
-[tool.setuptools.packages.find]
-include = ["select_multiple_field*"]
+[tool.hatch.version]
+path = "select_multiple_field/__about__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["select_multiple_field"]
+
+[tool.hatch.publish.pypi]
+repository = "pypi"
+
+[tool.hatch.publish.test]
+repository = "testpypi"
+
+[tool.hatch.envs.default.scripts]
+t = "python -m django test test_suite --settings=test_suite.settings_for_tests --verbosity=1"
+i = "python -m django test pizzagigi forthewing orm_test --settings=test_projects.django42.django42.settings --verbosity=1"
+tests = [
+    "hatch run t",
+    "hatch run i"
+]
+
+[tool.hatch.envs.release]
+dependencies = [
+    "django"
+]
+
+[tool.hatch.envs.release.scripts]
+install = "pip install  --force-reinstall --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple django-select-multiple-field"
+
+verify-release = [
+    "hatch run release:install",
+    "hatch run tests",
+]
+
+build-test = [
+    "hatch run tests",
+]
+

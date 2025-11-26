@@ -1,29 +1,15 @@
 import json
-import sys
 
-import django
 from django.core import serializers
+from django.db import connection
 from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 from django.utils.datastructures import MultiValueDict
 from django.utils.http import urlencode
 
-from .models import Pizza, show_topping
+from test_projects.asserts import safe_assert_redirects
 
-
-def safe_assert_redirects(test_case, response, expected_url):
-    """
-    Helper function to handle assertRedirects with Python 3.14 + Django 4.2 compatibility.
-
-    Python 3.14 + Django 4.2 has a known compatibility issue with template context copying
-    that affects assertRedirects. This function provides a workaround.
-    """
-    if sys.version_info >= (3, 14) and django.VERSION[:2] == (4, 2):
-        # For Python 3.14 + Django 4.2, just verify redirect status and location manually
-        test_case.assertEqual(response.status_code, 302)
-        test_case.assertEqual(response.url, expected_url)
-    else:
-        test_case.assertRedirects(response, expected_url)
+from .models import Pizza, show_dip, show_topping
 
 
 class PizzaListViewTestCase(TestCase):
@@ -82,6 +68,21 @@ class PizzaCreateViewTestCase(TestCase):
         self.assertIn(Pizza.MOZZARELLA, p.toppings)
         self.assertIn(Pizza.PANCETTA, p.toppings)
 
+    def test_creation_no_toppings(self):
+        """
+        If a placeholder empty value is sent, the toppings list should be empty.
+        """
+        data = {"toppings": [Pizza.MOZZARELLA], "dips": [""]}
+        response = self.client.post(
+            reverse("pizza:create"),
+            urlencode(MultiValueDict(data), doseq=True),
+            content_type="application/x-www-form-urlencoded",
+        )
+
+        safe_assert_redirects(self, response, reverse("pizza:created"))
+        p = Pizza.objects.all()[0]
+        self.assertListEqual(p.dips, [])
+
 
 class PizzaDetailViewTestCase(TestCase):
 
@@ -138,10 +139,119 @@ class PizzaModelTestCase(TestCase):
             topping_name = show_topping(k)
             self.assertEqual(topping_name, v)
 
+    def test_show_topping_unknown_key(self):
+        result = show_topping("unknown")
+        self.assertEqual(result, "unknown")
+
+    def test_show_dip_unknown_key(self):
+        result = show_dip("unknown")
+        self.assertEqual(result, "unknown")
+
     def test_value_converted_to_list_from_db(self):
         pizza = Pizza.objects.create(toppings=[Pizza.PEPPERONI])
         pizza_from_db = Pizza.objects.get(pk=pizza.pk)
         self.assertEqual(pizza_from_db.toppings, [Pizza.PEPPERONI])
+
+
+class PizzaNullDipsTestCase(TestCase):
+    """Tests for null=True storage behavior on the dips field"""
+
+    def test_create_with_no_dips_stores_null(self):
+        """Creating a pizza without dips stores NULL in the database"""
+        pizza = Pizza.objects.create(toppings=[Pizza.PEPPERONI])
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT dips FROM pizzagigi_pizza WHERE id = %s", [pizza.pk])
+            row = cursor.fetchone()
+        self.assertIsNone(row[0])
+
+    def test_create_with_empty_dips_stores_null(self):
+        """Creating a pizza with empty dips list stores NULL in the database"""
+        pizza = Pizza.objects.create(toppings=[Pizza.PEPPERONI], dips=[])
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT dips FROM pizzagigi_pizza WHERE id = %s", [pizza.pk])
+            row = cursor.fetchone()
+        self.assertIsNone(row[0])
+
+    def test_create_with_dips_stores_string(self):
+        """Creating a pizza with dips stores an encoded string in the database"""
+        pizza = Pizza.objects.create(toppings=[Pizza.PEPPERONI], dips=[Pizza.RANCH])
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT dips FROM pizzagigi_pizza WHERE id = %s", [pizza.pk])
+            row = cursor.fetchone()
+        self.assertIsInstance(row[0], str)
+
+    def test_load_null_dips_returns_empty_list(self):
+        """Loading a pizza with NULL dips from the database returns an empty list"""
+        pizza = Pizza.objects.create(toppings=[Pizza.PEPPERONI])
+        pizza_from_db = Pizza.objects.get(pk=pizza.pk)
+        self.assertEqual(pizza_from_db.dips, [])
+
+    def test_update_to_empty_dips_stores_null(self):
+        """Updating a pizza to remove all dips stores NULL in the database"""
+        pizza = Pizza.objects.create(
+            toppings=[Pizza.PEPPERONI], dips=[Pizza.RANCH, Pizza.BLUE_CHEESE]
+        )
+        pizza.dips = []
+        pizza.save()
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT dips FROM pizzagigi_pizza WHERE id = %s", [pizza.pk])
+            row = cursor.fetchone()
+        self.assertIsNone(row[0])
+
+    def test_update_to_empty_dips_returns_empty_list(self):
+        """After updating to empty dips, loading from DB returns an empty list"""
+        pizza = Pizza.objects.create(toppings=[Pizza.PEPPERONI], dips=[Pizza.RANCH])
+        pizza.dips = []
+        pizza.save()
+        pizza_from_db = Pizza.objects.get(pk=pizza.pk)
+        self.assertEqual(pizza_from_db.dips, [])
+
+    def test_create_view_no_dips_stores_null(self):
+        """POST to create view with no dips field stores NULL in database"""
+        data = {"toppings": [Pizza.PEPPERONI]}
+        response = self.client.post(
+            reverse("pizza:create"),
+            urlencode(MultiValueDict(data), doseq=True),
+            content_type="application/x-www-form-urlencoded",
+        )
+        self.assertEqual(response.status_code, 302)
+        pizza = Pizza.objects.all()[0]
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT dips FROM pizzagigi_pizza WHERE id = %s", [pizza.pk])
+            row = cursor.fetchone()
+        self.assertIsNone(row[0])
+
+    def test_create_view_empty_dips_stores_null(self):
+        """POST to create view with empty dips stores NULL in database"""
+        data = {"toppings": [Pizza.PEPPERONI], "dips": [""]}
+        response = self.client.post(
+            reverse("pizza:create"),
+            urlencode(MultiValueDict(data), doseq=True),
+            content_type="application/x-www-form-urlencoded",
+        )
+        self.assertEqual(response.status_code, 302)
+        pizza = Pizza.objects.all()[0]
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT dips FROM pizzagigi_pizza WHERE id = %s", [pizza.pk])
+            row = cursor.fetchone()
+        self.assertIsNone(row[0])
+
+    def test_update_view_clear_dips_stores_null(self):
+        """POST to update view clearing dips stores NULL in database"""
+        pizza = Pizza.objects.create(toppings=[Pizza.PEPPERONI], dips=[Pizza.RANCH])
+        data = {"toppings": [Pizza.PEPPERONI], "dips": [""]}
+        response = self.client.post(
+            reverse("pizza:update", args=[pizza.pk]),
+            urlencode(MultiValueDict(data), doseq=True),
+            content_type="application/x-www-form-urlencoded",
+        )
+        self.assertEqual(response.status_code, 302)
+        pizza_from_db = Pizza.objects.get(pk=pizza.pk)
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT dips FROM pizzagigi_pizza WHERE id = %s", [pizza.pk])
+            row = cursor.fetchone()
+        self.assertIsNone(row[0])
+        self.assertEqual(pizza_from_db.dips, [])
 
 
 class PizzaCozyTestCase(TestCase):

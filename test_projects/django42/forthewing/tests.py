@@ -1,28 +1,13 @@
-import sys
-
-import django
+from django.db import connection
 from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 from django.utils.datastructures import MultiValueDict
 from django.utils.http import urlencode
 
+from test_projects.asserts import safe_assert_redirects
+
 from .forms import BLUE_CHEESE, HONEY_MUSTARD, RANCH, DipsForm
 from .models import ChickenWings, show_flavour
-
-
-def safe_assert_redirects(test_case, response, expected_url):
-    """
-    Helper function to handle assertRedirects with Python 3.14 + Django 4.2 compatibility.
-
-    Python 3.14 + Django 4.2 has a known compatibility issue with template context copying
-    that affects assertRedirects. This function provides a workaround.
-    """
-    if sys.version_info >= (3, 14) and django.VERSION[:2] == (4, 2):
-        # For Python 3.14 + Django 4.2, just verify redirect status and location manually
-        test_case.assertEqual(response.status_code, 302)
-        test_case.assertEqual(response.url, expected_url)
-    else:
-        test_case.assertRedirects(response, expected_url)
 
 
 class ChickenWingsListViewTestCase(TestCase):
@@ -139,6 +124,10 @@ class ChickenWingsDeleteViewTestCase(TestCase):
 
 class ChickenWingsModelTestCase(SimpleTestCase):
 
+    def test_show_flavour_unknown_key(self):
+        result = show_flavour("unknown")
+        self.assertEqual(result, "")
+
     def test_show_flavour(self):
         for k, v in ChickenWings.FLAVOUR_CHOICES:
             if isinstance(v, (list, tuple)):
@@ -150,7 +139,83 @@ class ChickenWingsModelTestCase(SimpleTestCase):
                 self.assertEqual(flavour_name, v)
 
 
+class ChickenWingsNullOptionalFlavourTestCase(TestCase):
+    """Tests for null=True storage behavior on the optional_flavour field"""
+
+    def test_create_with_no_optional_flavour_stores_null(self):
+        """Creating wings without optional_flavour stores NULL in the database"""
+        wings = ChickenWings.objects.create(flavour=[ChickenWings.HOT])
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT optional_flavour FROM forthewing_chickenwings WHERE id = %s",
+                [wings.pk],
+            )
+            row = cursor.fetchone()
+        self.assertIsNone(row[0])
+
+    def test_create_with_empty_optional_flavour_stores_null(self):
+        """Creating wings with empty optional_flavour list stores NULL in the database"""
+        wings = ChickenWings.objects.create(
+            flavour=[ChickenWings.HOT], optional_flavour=[]
+        )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT optional_flavour FROM forthewing_chickenwings WHERE id = %s",
+                [wings.pk],
+            )
+            row = cursor.fetchone()
+        self.assertIsNone(row[0])
+
+    def test_create_with_optional_flavour_stores_string(self):
+        """Creating wings with optional_flavour stores an encoded string in the database"""
+        wings = ChickenWings.objects.create(
+            flavour=[ChickenWings.HOT], optional_flavour=[ChickenWings.JERK]
+        )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT optional_flavour FROM forthewing_chickenwings WHERE id = %s",
+                [wings.pk],
+            )
+            row = cursor.fetchone()
+        self.assertIsInstance(row[0], str)
+
+    def test_load_null_optional_flavour_returns_empty_list(self):
+        """Loading wings with NULL optional_flavour from the database returns an empty list"""
+        wings = ChickenWings.objects.create(flavour=[ChickenWings.HOT])
+        wings_from_db = ChickenWings.objects.get(pk=wings.pk)
+        self.assertEqual(wings_from_db.optional_flavour, [])
+
+    def test_update_to_empty_optional_flavour_stores_null(self):
+        """Updating wings to remove all optional flavours stores NULL in the database"""
+        wings = ChickenWings.objects.create(
+            flavour=[ChickenWings.HOT],
+            optional_flavour=[ChickenWings.JERK, ChickenWings.BACON],
+        )
+        wings.optional_flavour = []
+        wings.save()
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT optional_flavour FROM forthewing_chickenwings WHERE id = %s",
+                [wings.pk],
+            )
+            row = cursor.fetchone()
+        self.assertIsNone(row[0])
+
+    def test_update_to_empty_optional_flavour_returns_empty_list(self):
+        """After updating to empty optional_flavour, loading from DB returns an empty list"""
+        wings = ChickenWings.objects.create(
+            flavour=[ChickenWings.HOT], optional_flavour=[ChickenWings.JERK]
+        )
+        wings.optional_flavour = []
+        wings.save()
+        wings_from_db = ChickenWings.objects.get(pk=wings.pk)
+        self.assertEqual(wings_from_db.optional_flavour, [])
+
+
 class DipsFormTestCase(TestCase):
+    """
+    This form is used to check if the field works when no option is selected
+    """
 
     def test_valid_choices(self):
         form = DipsForm(data={"dips": [RANCH, BLUE_CHEESE]})
@@ -159,4 +224,3 @@ class DipsFormTestCase(TestCase):
     def test_no_choice_selected(self):
         form = DipsForm(data={"dips": []})
         self.assertTrue(form.is_valid())
-        print(form.cleaned_data)

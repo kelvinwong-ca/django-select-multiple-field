@@ -1,26 +1,29 @@
 from django.conf import settings
 
-DEFAULT_DELIMITER = ","
+from . import DEFAULT_DELIMITER
+
+delimiter = getattr(settings, "SELECTMULTIPLEFIELD_DELIMITER", DEFAULT_DELIMITER)
+if len(delimiter) != 1:
+    raise ValueError("SELECTMULTIPLEFIELD_DELIMITER must be exactly one character")
+_DELIMITER = delimiter
 
 
 def decode_csv_to_list(encoded):
     """
-    Decodes a delimiter separated string to a Python list
+    Decodes a delimiter separated string to a Python list.
+
+    Preserves order and duplicates (no sorting, no deduplication).
     """
-    delimiter = getattr(settings, "SELECTMULTIPLEFIELD_DELIMITER", DEFAULT_DELIMITER)
     if encoded == "":
         return []
 
-    decoded = sorted(set(encoded.split(delimiter)))
-    return decoded
+    return encoded.split(_DELIMITER)
 
 
 def encode_list_to_csv(decoded):
     """
-    Encodes a Python list to a delimiter separated string
+    Encodes a Python list to a delimiter separated string.
 
-    Note: This sorts the list lexicographically
+    Preserves order and duplicates (no sorting, no deduplication).
     """
-    delimiter = getattr(settings, "SELECTMULTIPLEFIELD_DELIMITER", DEFAULT_DELIMITER)
-    decoded = sorted(set(decoded))
-    return delimiter.join(decoded)
+    return _DELIMITER.join(decoded)

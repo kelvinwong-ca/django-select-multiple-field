@@ -1,9 +1,11 @@
+import warnings
+
 from django.forms import widgets
 
 HTML_ATTR_CLASS = "select-multiple-field"
 
 
-class SelectMultipleField(widgets.SelectMultiple):
+class SelectMultipleWidget(widgets.SelectMultiple):
     """Multiple select widget ready for jQuery multiselect.js"""
 
     allow_multiple_selected = True
@@ -15,23 +17,36 @@ class SelectMultipleField(widgets.SelectMultiple):
         if value is None:
             value = []
 
-        # Set choices if provided
-        if choices:
-            self.choices = choices
-
-        # Use parent's render method and just ensure our class is added
-        if renderer is not None:
-            # Pass renderer parameter for Django 5.x compatibility
-            return super().render(name, value, attrs=rendered_attrs, renderer=renderer)
-        else:
-            # Fallback for Django < 5.x
-            return super().render(name, value, attrs=rendered_attrs)
+        original_choices = self.choices
+        try:
+            if choices:
+                self.choices = choices
+            if renderer is not None:
+                return super().render(
+                    name, value, attrs=rendered_attrs, renderer=renderer
+                )
+            else:
+                return super().render(name, value, attrs=rendered_attrs)
+        finally:
+            self.choices = original_choices
 
     def value_from_datadict(self, data, files, name):
         """
-        SelectMultipleField widget delegates processing of raw user data to
+        SelectMultipleWidget delegates processing of raw user data to
         Django's SelectMultiple widget
 
         Returns list or None
         """
-        return super(SelectMultipleField, self).value_from_datadict(data, files, name)
+        return super().value_from_datadict(data, files, name)
+
+
+class SelectMultipleField(SelectMultipleWidget):
+    """Deprecated — use SelectMultipleWidget instead."""
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "SelectMultipleField is deprecated; use SelectMultipleWidget instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)

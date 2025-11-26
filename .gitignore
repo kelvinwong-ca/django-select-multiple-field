@@ -60,3 +60,6 @@ docs/_build/
 # Sqlite dev dbs
 *.sqlite
 *.sqlite3
+
+DEV.md
+.vscode/

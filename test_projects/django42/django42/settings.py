@@ -16,10 +16,8 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-MODULE_DIR = BASE_DIR.parent
 
 sys.path.append(str(BASE_DIR))
-sys.path.append(str(MODULE_DIR))
 
 
 # Quick-start development settings - unsuitable for production
@@ -40,6 +38,7 @@ INSTALLED_APPS = [
     "select_multiple_field",
     "pizzagigi",
     "forthewing",
+    "orm_test",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

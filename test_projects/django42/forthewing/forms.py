@@ -17,4 +17,5 @@ class DipsForm(forms.Form):
         choices=DIP_CHOICES,
         widget=forms.CheckboxSelectMultiple,
         required=False,
+        include_blank=True,
     )
