@@ -7,8 +7,10 @@ from unittest.mock import patch
 import django
 from django.core import validators
 from django.core.exceptions import ValidationError
-from django.db.models.fields import BLANK_CHOICE_DASH, CharField, Field
+from django.db.models.fields import CharField, Field
 from django.test import SimpleTestCase
+
+from test_suite import has_blank_choice
 
 from select_multiple_field.codecs import encode_list_to_csv
 from select_multiple_field.forms import SelectMultipleFormField
@@ -84,12 +86,12 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         self.assertTrue(item._include_blank_set)
         # kwargs include_blank should be ignored
         choices = item.get_choices(include_blank=False)
-        self.assertIn(BLANK_CHOICE_DASH[0], choices)
+        self.assertTrue(has_blank_choice(choices))
 
         # When not set on field, kwargs should be respected
         item2 = SelectMultipleField(choices=self.choices)
         choices2 = item2.get_choices(include_blank=True)
-        self.assertIn(BLANK_CHOICE_DASH[0], choices2)
+        self.assertTrue(has_blank_choice(choices2))
 
     def test_instantiation_include_blank_false_explicit(self):
         """
@@ -410,11 +412,11 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         choices = item.get_choices()
         self.assertIsInstance(choices, list)
         self.assertIsInstance(choices[0], tuple)
-        self.assertNotIn(BLANK_CHOICE_DASH[0], choices)
+        self.assertFalse(has_blank_choice(choices))
         choices = item.get_choices(include_blank=False)
         self.assertIsInstance(choices, list)
         self.assertIsInstance(choices[0], tuple)
-        self.assertNotIn(BLANK_CHOICE_DASH[0], choices)
+        self.assertFalse(has_blank_choice(choices))
 
     def test_get_choices_w_blank_choice(self):
         """Overridden get_choices suppresses blank choice tuple"""
@@ -422,7 +424,7 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         choices = item.get_choices(include_blank=True)
         self.assertIsInstance(choices, list)
         self.assertIsInstance(choices[0], tuple)
-        self.assertIn(BLANK_CHOICE_DASH[0], choices)
+        self.assertTrue(has_blank_choice(choices))
 
     def test_get_choices_include_blank(self):
         """
@@ -434,20 +436,20 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         choices = item.get_choices()
         self.assertIsInstance(choices, list)
         self.assertIsInstance(choices[0], tuple)
-        self.assertIn(BLANK_CHOICE_DASH[0], choices)
+        self.assertTrue(has_blank_choice(choices))
         choices = item.get_choices(include_blank=False)
         self.assertIsInstance(choices, list)
         self.assertIsInstance(choices[0], tuple)
-        self.assertIn(BLANK_CHOICE_DASH[0], choices)
+        self.assertTrue(has_blank_choice(choices))
         item = SelectMultipleField(choices=self.choices, include_blank=False)
         choices = item.get_choices()
         self.assertIsInstance(choices, list)
         self.assertIsInstance(choices[0], tuple)
-        self.assertNotIn(BLANK_CHOICE_DASH[0], choices)
+        self.assertFalse(has_blank_choice(choices))
         choices = item.get_choices(include_blank=True)
         self.assertIsInstance(choices, list)
         self.assertIsInstance(choices[0], tuple)
-        self.assertNotIn(BLANK_CHOICE_DASH[0], choices)
+        self.assertFalse(has_blank_choice(choices))
 
     def test_validate_valid_choices(self):
         for choices in self.test_choices:
@@ -759,7 +761,7 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         self.assertTrue(form.required)
         self.assertFalse(item.null)
         self.assertEqual(form.empty_value, [])
-        self.assertNotIn(BLANK_CHOICE_DASH[0], form.choices)
+        self.assertFalse(has_blank_choice(form.choices))
 
     def test_formfield_empty_value_w_blank(self):
         """
@@ -772,4 +774,4 @@ class SelectMultipleFieldTestCase(SimpleTestCase):
         self.assertFalse(form.required)
         self.assertFalse(item.null)
         self.assertEqual(form.empty_value, [])
-        self.assertIn(BLANK_CHOICE_DASH[0], form.choices)
+        self.assertTrue(has_blank_choice(form.choices))

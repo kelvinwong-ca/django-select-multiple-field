@@ -4,6 +4,8 @@ from unittest.mock import patch
 from django.forms import fields
 from django.test import SimpleTestCase
 
+from test_suite import has_blank_choice
+
 from select_multiple_field.codecs import encode_list_to_csv
 from select_multiple_field.forms import (
     DEFAULT_MAX_CHOICES_ATTR,
@@ -173,7 +175,7 @@ class SelectMultipleFormFieldTestCase(SimpleTestCase):
         """
         ff = SelectMultipleFormField(choices=self.choices)
         choices = ff.get_choices()
-        self.assertNotIn(("", "---------"), choices)
+        self.assertFalse(has_blank_choice(choices))
 
     def test_widget_attrs_size(self):
         """Widget passed size info"""
