@@ -45,6 +45,14 @@ path = "select_multiple_field/__about__.py"
 [tool.hatch.build.targets.wheel]
 packages = ["select_multiple_field"]
 
+[tool.hatch.build.targets.sdist]
+only-include = [
+    "/select_multiple_field",
+    "/LICENSE",
+    "/README.md",
+    "/CONTRIBUTORS.md",
+]
+
 [tool.hatch.publish.pypi]
 repository = "pypi"
 
